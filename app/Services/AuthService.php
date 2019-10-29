@@ -24,7 +24,7 @@ class AuthService extends BaseService
 
     public function login(Request $request)
     {
-        $field       = filter_var($request->all(), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $field       = filter_var($request->all(), FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         $credentials = [
             $field     => $request['account'],
             'password' => $request['password']
@@ -41,7 +41,6 @@ class AuthService extends BaseService
             $msg = 'Tài khoản của bạn đã bị vô hiệu hóa, xin vui lòng liên hệ với ban quản trị';
             abort(Response::HTTP_UNAUTHORIZED, $msg);
         }
-
 
         $this->setMessage('Đăng nhập thành công');
         $this->setData([
