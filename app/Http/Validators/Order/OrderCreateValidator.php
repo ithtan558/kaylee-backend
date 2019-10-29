@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Validators\Auth;
+namespace App\Http\Validators\Order;
 
 use  App\Http\Validators\AbstractValidator;
 
-class LoginValidator implements AbstractValidator
+class OrderCreateValidator implements AbstractValidator
 {
     public static function rules()
     {
         return [
-            'account'  => 'required|min:3',
-            'password' => 'required|min:3'
+            'cart_items' => 'required|array'
         ];
     }
 

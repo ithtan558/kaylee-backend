@@ -8,15 +8,16 @@ class ActivityLog extends BaseModel
     const UPDATED_AT = 'updated_date';
 
     protected $table = 'activity_log';
-    protected $fillable = [
-        'user_id',
-        'path',
-        'method',
-        'ip',
-        'params',
-        'created_by',
-        'updated_by'
-    ];
+    protected $fillable
+        = [
+            'user_id',
+            'path',
+            'method',
+            'ip',
+            'params',
+            'created_by',
+            'updated_by'
+        ];
 
     public function user()
     {

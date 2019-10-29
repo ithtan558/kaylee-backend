@@ -9,12 +9,12 @@ class ServiceUpdateValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'id' => 'exists:service,id',
-            'name' => 'required',
-            'brand_ids' => 'required',
+            'id'          => 'exists:service,id',
+            'name'        => 'required',
+            'brand_ids'   => 'required',
             'category_id' => 'required|integer',
-            'time' => 'required',
-            'price' => 'required'
+            'time'        => 'required',
+            'price'       => 'required'
         ];
     }
 

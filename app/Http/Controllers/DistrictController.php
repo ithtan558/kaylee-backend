@@ -14,7 +14,7 @@ class DistrictController extends Controller
 
     public function __construct(Request $request, DistrictService $districtService)
     {
-        $this->request = $request;
+        $this->request         = $request;
         $this->districtService = $districtService;
     }
 

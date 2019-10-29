@@ -18,15 +18,15 @@ class AuthService extends BaseService
 
     public function __construct(UserRepository $userRep, UserRoleRepository $userRoleRep)
     {
-        $this->userRep = $userRep;
+        $this->userRep     = $userRep;
         $this->userRoleRep = $userRoleRep;
     }
 
     public function login(Request $request)
     {
-        $field = filter_var($request->all(), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $field       = filter_var($request->all(), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         $credentials = [
-            $field => $request['account'],
+            $field     => $request['account'],
             'password' => $request['password']
         ];
 
@@ -38,14 +38,14 @@ class AuthService extends BaseService
         $auth = JWTAuth::user();
 
         if ($auth->is_active != STATUS_ACTIVE) {
-            $msg = 'Your account is inactive. Please contact your system administrator';
+            $msg = 'Tài khoản của bạn đã bị vô hiệu hóa, xin vui lòng liên hệ với ban quản trị';
             abort(Response::HTTP_UNAUTHORIZED, $msg);
         }
 
 
-        $this->setMessage('Login successfully.');
+        $this->setMessage('Đăng nhập thành công');
         $this->setData([
-            'token' => $token,
+            'token'     => $token,
             'user_info' => $auth,
         ]);
 
@@ -54,11 +54,11 @@ class AuthService extends BaseService
 
     public function logout()
     {
-        $token = JWTAuth::getToken();
+        $token  = JWTAuth::getToken();
         $params = [];
 
         try {
-            $user = JWTAuth::user();
+            $user   = JWTAuth::user();
             $params = ['user_id' => $user ? $user->id : 0];
 
             JWTAuth::setToken($token)->invalidate();
@@ -66,7 +66,7 @@ class AuthService extends BaseService
             abort(Response::HTTP_UNAUTHORIZED, 'Token is invalid');
         }
 
-        $this->setMessage("Logged successfully");
+        $this->setMessage("Đăng xuất thành công");
 
         return $this->getResponseData();
     }
@@ -76,7 +76,7 @@ class AuthService extends BaseService
         $user = '';
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                abort(Response::HTTP_UNAUTHORIZED, 'Not Found User');
+                abort(Response::HTTP_UNAUTHORIZED, 'Không tìm thấy User');
             }
         } catch (TokenExpiredException $ex) {
             abort(Response::HTTP_UNAUTHORIZED, 'Token expired');
@@ -87,7 +87,7 @@ class AuthService extends BaseService
         }
 
         // Get roles
-        $roles = $this->userRoleRep->getRoleByUserId($user->id)->pluck('code');
+        $roles       = $this->userRoleRep->getRoleByUserId($user->id)->pluck('code');
         $user->roles = $roles;
         $this->setData($user);
 
@@ -98,18 +98,18 @@ class AuthService extends BaseService
     {
         $dataCreate = [
             [
-                'is_master' => 0,
-                'roles_id' => 7,
-                'username' => 'phd-internal',
-                'email' => 'phd-internal@gmail.com',
-                'password' => app('hash')->make('phd1234@'),
+                'is_master'         => 0,
+                'roles_id'          => 7,
+                'username'          => 'phd-internal',
+                'email'             => 'phd-internal@gmail.com',
+                'password'          => app('hash')->make('phd1234@'),
                 'original_password' => 'phd1234@',
-                'first_name' => 'PHD',
-                'last_name' => 'Internal',
-                'full_name' => 'PHD Internal',
-                'birthday' => '1995-01-01',
-                'phone' => '012345678',
-                'address' => 'Jakata',
+                'first_name'        => 'PHD',
+                'last_name'         => 'Internal',
+                'full_name'         => 'PHD Internal',
+                'birthday'          => '1995-01-01',
+                'phone'             => '012345678',
+                'address'           => 'Jakata',
             ]
         ];
         foreach ($dataCreate as $data) {

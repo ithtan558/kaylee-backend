@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
-use App\Http\Validators\OutletMaster\BrandCreateValidator;
+use App\Helpers\CommonHelper;
 use App\Libraries\Api;
 use App\Repositories\BrandRepository;
 use App\Repositories\BrandServiceRepository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BrandService extends BaseService
 {
@@ -18,7 +19,7 @@ class BrandService extends BaseService
         BrandServiceRepository $brandServiceRep
     )
     {
-        $this->brandRep = $brandRep;
+        $this->brandRep        = $brandRep;
         $this->brandServiceRep = $brandServiceRep;
     }
 
@@ -51,22 +52,23 @@ class BrandService extends BaseService
     {
         try {
             $dataCreate = [
-                'name' => $request['name'],
-                'phone' => $request['phone'],
-                'location' => $request['location'],
-                'city_id' => $request['city_id'],
+                'name'        => $request['name'],
+                'phone'       => $request['phone'],
+                'location'    => $request['location'],
+                'city_id'     => $request['city_id'],
                 'district_id' => $request['district_id'],
-                'is_active' => STATUS_ACTIVE,
-                'start_time' => $request['start_time'],
-                'end_time' => $request['end_time']
+                'is_active'   => STATUS_ACTIVE,
+                'start_time'  => $request['start_time'],
+                'end_time'    => $request['end_time'],
+                'created_by'  => $this->getCurrentUser('id')
             ];
 
-            $name = $this->uploadImage($request);
+            $name                = CommonHelper::uploadImage($request);
             $dataCreate['image'] = $name;
 
 
             $this->brandRep->create($dataCreate);
-            $this->setMessage('Created successfully.');
+            $this->setMessage('Tạo chi nhánh thành công');
             $this->setData($dataCreate);
         } catch (\Exception $ex) {
             $this->setMessage($ex->getMessage());
@@ -79,21 +81,22 @@ class BrandService extends BaseService
     {
         try {
             $dataUpdate = [
-                'name' => $request['name'],
-                'phone' => $request['phone'],
-                'location' => $request['location'],
-                'city_id' => $request['city_id'],
+                'name'        => $request['name'],
+                'phone'       => $request['phone'],
+                'location'    => $request['location'],
+                'city_id'     => $request['city_id'],
                 'district_id' => $request['district_id'],
-                'is_active' => STATUS_ACTIVE,
-                'start_time' => $request['start_time'],
-                'end_time' => $request['end_time']
+                'is_active'   => STATUS_ACTIVE,
+                'start_time'  => $request['start_time'],
+                'end_time'    => $request['end_time'],
+                'updated_by'  => $this->getCurrentUser('id')
             ];
 
-            $name = $this->uploadImage($request);
+            $name                = CommonHelper::uploadImage($request);
             $dataUpdate['image'] = $name;
 
             $this->brandRep->update($dataUpdate, $request['id']);
-            $this->setMessage('Updated successfully.');
+            $this->setMessage('Cập nhật chi nhánh thành công');
             $this->setData($dataUpdate);
         } catch (\Exception $ex) {
             $this->setMessage($ex->getMessage());
@@ -102,15 +105,13 @@ class BrandService extends BaseService
         return $this->getResponseData();
     }
 
-    protected function uploadImage($request) {
-        $name = '';
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $name = $image->getClientOriginalName();
-            $destinationPath = public_path('/upload/images');
-            $image->move($destinationPath, $name);
-        }
-        return $name;
+    public function delete($id)
+    {
+        $this->brandRep->destroy($id);
+        $this->setMessage('Xóa chi nhánh thành công');
+        $this->setStatusCode(Response::HTTP_OK);
+
+        return $this->getResponseData();
     }
 
 }

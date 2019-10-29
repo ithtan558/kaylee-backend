@@ -9,11 +9,11 @@ class ServiceCreateValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'name'          => 'required',
-            'brand_ids'  => 'required',
-            'category_id'      => 'required|integer',
-            'time'     => 'required',
-            'price'         => 'required'
+            'name'        => 'required',
+            'brand_ids'   => 'required',
+            'category_id' => 'required|integer',
+            'time'        => 'required',
+            'price'       => 'required'
         ];
     }
 

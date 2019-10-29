@@ -24,7 +24,7 @@ $app->post('/login', 'AuthController@login');
 
 // City
 $app->group([
-    'prefix' => "/city",
+    'prefix'    => "/city",
     'namespace' => $namespace
 ], function () use ($app) {
     $app->get('/all', 'CityController@getAll');
@@ -32,7 +32,7 @@ $app->group([
 
 // District
 $app->group([
-    'prefix' => "/district",
+    'prefix'    => "/district",
     'namespace' => $namespace
 ], function () use ($app) {
     $app->get('/all', 'DistrictController@getAll');
@@ -41,7 +41,7 @@ $app->group([
 
 // Brand
 $app->group([
-    'prefix' => "/brand",
+    'prefix'    => "/brand",
     'namespace' => $namespace
 ], function () use ($app) {
     $app->post('/', 'BrandController@create');
@@ -49,11 +49,12 @@ $app->group([
     $app->get('/{id}', 'BrandController@getDetail');
     $app->post('/{id}', 'BrandController@update');
     $app->get('/', 'BrandController@getList');
+    $app->delete('/delete/{id}', 'BrandController@delete');
 });
 
 // Service category
 $app->group([
-    'prefix' => "/service-category",
+    'prefix'    => "/service-category",
     'namespace' => $namespace
 ], function () use ($app) {
     $app->post('/', 'ServiceCategoryController@create');
@@ -65,7 +66,7 @@ $app->group([
 
 // Service
 $app->group([
-    'prefix' => "/service",
+    'prefix'    => "/service",
     'namespace' => $namespace
 ], function () use ($app) {
     $app->post('/', 'ServiceController@create');
@@ -73,6 +74,36 @@ $app->group([
     $app->get('/{id}', 'ServiceController@getDetail');
     $app->post('/{id}', 'ServiceController@update');
     $app->get('/', 'ServiceController@getList');
+    $app->delete('/delete/{id}', 'ServiceController@delete');
 });
+
+// Customer
+$app->group([
+    'prefix'    => "/customer",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->post('/', 'CustomerController@create');
+    $app->get('/all', 'CustomerController@getAll');
+    $app->get('/get-by-phone-and-name', 'CustomerController@getByPhoneAndName');
+    $app->get('/{id}', 'CustomerController@getDetail');
+    $app->post('/{id}', 'CustomerController@update');
+    $app->get('/', 'CustomerController@getList');
+    $app->delete('/delete/{id}', 'ServiceController@delete');
+});
+
+
+// Order
+$app->group([
+    'prefix'    => "/order",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->post('/', 'OrderController@create');
+    $app->get('/all', 'OrderController@getAll');
+    $app->get('/{id}', 'OrderController@getDetail');
+    $app->post('/{id}', 'OrderController@update');
+    $app->get('/', 'OrderController@getList');
+});
+
+
 
 

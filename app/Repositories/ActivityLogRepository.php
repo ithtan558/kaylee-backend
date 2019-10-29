@@ -18,8 +18,8 @@ class ActivityLogRepository extends BaseRepository
     public function getList($params)
     {
         $length = isset($params['limit']) ? $params['limit'] : 10;
-        $order = isset($params['sort']) ? $params['sort'] : ActivityLog::getCol('id');
-        $sort = isset($params['order']) ? $params['order'] : 'DESC';
+        $order  = isset($params['sort']) ? $params['sort'] : ActivityLog::getCol('id');
+        $sort   = isset($params['order']) ? $params['order'] : 'DESC';
 
         $query = $this->model
             ->select("*")
@@ -32,15 +32,15 @@ class ActivityLogRepository extends BaseRepository
 
     public function writingAccessLog(array $params)
     {
-        $auth = CommonHelper::getAuth();
+        $auth   = CommonHelper::getAuth();
         $userId = $auth ? $auth->id : 0;
 
         return $this->model->create([
-            'path' => app('request')->path(),
-            'user_id' => $userId,
-            'method' => app('request')->method(),
-            'ip' => $_SERVER['REMOTE_ADDR'],
-            'params' => json_encode($params, true),
+            'path'       => app('request')->path(),
+            'user_id'    => $userId,
+            'method'     => app('request')->method(),
+            'ip'         => $_SERVER['REMOTE_ADDR'],
+            'params'     => json_encode($params, true),
             'created_by' => $userId,
         ]);
     }

@@ -2,12 +2,11 @@
 
 namespace App\Repositories;
 
-use App\Models\OutletMaster;
-use App\Models\Service;
+use App\Models\Customer;
 
-class ServiceRepository extends BaseRepository
+class CustomerRepository extends BaseRepository
 {
-    public function __construct(Service $model)
+    public function __construct(Customer $model)
     {
         parent::__construct($model);
     }
@@ -16,7 +15,7 @@ class ServiceRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [Service::getCol('name')],
+                'field'   => [Customer::getCol('name'), Customer::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -40,7 +39,7 @@ class ServiceRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select(Service::getCol('*'));
+        $query = $this->model->select(Customer::getCol('*'));
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         $query = $query->orderBy($order, $sort)
@@ -49,10 +48,23 @@ class ServiceRepository extends BaseRepository
         return $this->formatPagination($query);
     }
 
+    public function getByPhone($params)
+    {
+        $order = 'id';
+        $sort  = $this->getOrder($params);
+
+        $query = $this->model->select(Customer::getCol('*'));
+        $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
+
+        $result = $query->orderBy($order, $sort)->get();
+
+        return $result;
+    }
+
     public function getDetail($id)
     {
         $query = $this->model
-            ->select("id", "name", "code", "description", "time", "price", "category_id", "image")
+            ->select("id", "name", "phone", "email", "birthday", "image")
             ->where('id', $id)
             ->first();
 

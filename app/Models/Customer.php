@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-class ServiceCategory extends BaseModel
+class Customer extends BaseModel
 {
 
-    protected $table = 'service_category';
+    protected $table = 'customer';
     protected $fillable
         = [
             'name',
-            'description',
+            'phone',
+            'email',
+            'birthday',
             'image',
             'created_by',
             'updated_by'

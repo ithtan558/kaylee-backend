@@ -6,9 +6,10 @@ class BrandService extends BaseModel
 {
 
     protected $table = 'brand_service';
-    protected $fillable = [
-        'brand_id',
-        'service_id'
-    ];
+    protected $fillable
+        = [
+            'brand_id',
+            'service_id'
+        ];
 
 }

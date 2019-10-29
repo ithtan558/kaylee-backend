@@ -2,41 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Validators\Service\CustomerCreateValidator;
-use App\Http\Validators\Service\CustomerUpdateValidator;
+use App\Http\Validators\Customer\CustomerCreateValidator;
+use App\Http\Validators\Customer\CustomerUpdateValidator;
 use Illuminate\Http\Request;
-use App\Services\ServiceService;
+use App\Services\CustomerService;
 use App\Libraries\Api;
 
-class ServiceController extends Controller
+class CustomerController extends Controller
 {
 
     protected $request;
-    protected $serviceService;
+    protected $customerService;
 
-    public function __construct(Request $request, ServiceService $serviceService)
+    public function __construct(Request $request, CustomerService $customerService)
     {
-        $this->request        = $request;
-        $this->serviceService = $serviceService;
+        $this->request         = $request;
+        $this->customerService = $customerService;
     }
 
     public function getAll()
     {
-        $data = $this->serviceService->getAll();
+        $data = $this->customerService->getAll();
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
     public function getList()
     {
-        $data = $this->serviceService->getList($this->request);
+        $data = $this->customerService->getList($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function getByPhoneAndName()
+    {
+        $data = $this->customerService->getByPhone($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
     public function getDetail($id)
     {
-        $result = $this->serviceService->getDetail($id);
+        $result = $this->customerService->getDetail($id);
 
         return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
     }
@@ -45,7 +52,7 @@ class ServiceController extends Controller
     {
         $this->validate($this->request, CustomerCreateValidator::rules(), CustomerCreateValidator::messages());
 
-        $data = $this->serviceService->create($this->request);
+        $data = $this->customerService->create($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
@@ -54,14 +61,14 @@ class ServiceController extends Controller
     {
         $this->validate($this->request, CustomerUpdateValidator::rules(), CustomerUpdateValidator::messages());
 
-        $data = $this->serviceService->update($this->request);
+        $data = $this->customerService->update($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
     public function delete($id)
     {
-        $data = $this->serviceService->delete($id);
+        $data = $this->customerService->delete($id);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }

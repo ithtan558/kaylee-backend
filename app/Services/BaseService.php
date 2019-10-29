@@ -35,7 +35,7 @@ class BaseService
     {
         return [
             RESPONSE_KEY => [
-                DATA_KEY => $this->data,
+                DATA_KEY    => $this->data,
                 MESSAGE_KEY => $this->message,
             ],
             STT_CODE_KEY => $this->getStatusCode()

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Libraries\Api;
+use App\Helpers\CommonHelper;
 use App\Repositories\ServiceRepository;
 use App\Repositories\BrandServiceRepository;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class ServiceService extends BaseService
         BrandServiceRepository $brandServiceRep
     )
     {
-        $this->serviceRep = $serviceRep;
+        $this->serviceRep      = $serviceRep;
         $this->brandServiceRep = $brandServiceRep;
     }
 
@@ -40,8 +40,8 @@ class ServiceService extends BaseService
 
     public function getDetail($id)
     {
-        $data = $this->serviceRep->getDetail($id);
-        $brandServices = $this->brandServiceRep->getByServiceId($id)->pluck('brand_id');
+        $data            = $this->serviceRep->getDetail($id);
+        $brandServices   = $this->brandServiceRep->getByServiceId($id)->pluck('brand_id');
         $data->brand_ids = $brandServices;
         $this->setData($data);
 
@@ -52,16 +52,17 @@ class ServiceService extends BaseService
     {
         try {
             $dataCreate = [
-                'name' => $request['name'],
-                'code' => $request['code'],
+                'name'        => $request['name'],
+                'code'        => $request['code'],
                 'description' => $request['description'],
                 'category_id' => $request['category_id'],
-                'time' => $request['time'],
-                'price' => $request['price'],
-                'is_active' => STATUS_ACTIVE
+                'time'        => $request['time'],
+                'price'       => $request['price'],
+                'is_active'   => STATUS_ACTIVE,
+                'created_by'  => $this->getCurrentUser('id')
             ];
 
-            $name = $this->uploadImage($request);
+            $name                = CommonHelper::uploadImage($request);
             $dataCreate['image'] = $name;
 
             $service = $this->serviceRep->create($dataCreate);
@@ -69,13 +70,13 @@ class ServiceService extends BaseService
             $arr_brand = explode(',', $request['brand_ids']);
             foreach ($arr_brand as $brand) {
                 $dataCreateBrandService = [
-                    'brand_id' => $brand,
+                    'brand_id'   => $brand,
                     'service_id' => $service->id
                 ];
                 $this->brandServiceRep->create($dataCreateBrandService);
             }
 
-            $this->setMessage('Created successfully.');
+            $this->setMessage('Tạo dịch vụ thành công');
             $this->setData($dataCreate);
         } catch (\Exception $ex) {
             $this->setMessage($ex->getMessage());
@@ -88,34 +89,35 @@ class ServiceService extends BaseService
     {
         try {
             $dataUpdate = [
-                'name' => $request['name'],
-                'code' => $request['code'],
+                'name'        => $request['name'],
+                'code'        => $request['code'],
                 'description' => $request['description'],
                 'category_id' => $request['category_id'],
-                'time' => $request['time'],
-                'price' => $request['price'],
-                'is_active' => STATUS_ACTIVE
+                'time'        => $request['time'],
+                'price'       => $request['price'],
+                'is_active'   => STATUS_ACTIVE,
+                'updated_by'  => $this->getCurrentUser('id')
             ];
 
-            $name = $this->uploadImage($request);
+            $name                = $this->uploadImage($request);
             $dataCreate['image'] = $name;
 
             $this->serviceRep->update($dataUpdate, $request['id']);
 
             // Delete all brand service of this service first
 
-            $this->brandServiceRep->deleteByServiceId( $request['id']);
+            $this->brandServiceRep->deleteByServiceId($request['id']);
             // Insert brand service table
             $arr_brand = explode(',', $request['brand_ids']);
             foreach ($arr_brand as $brand) {
                 $dataCreateBrandService = [
-                    'brand_id' => $brand,
-                    'service_id' =>  $request['id']
+                    'brand_id'   => $brand,
+                    'service_id' => $request['id']
                 ];
                 $this->brandServiceRep->create($dataCreateBrandService);
             }
 
-            $this->setMessage('Updated successfully.');
+            $this->setMessage('Cập nhật dịch vụ thành công');
             $this->setData($dataCreate);
         } catch (\Exception $ex) {
             $this->setMessage($ex->getMessage());
@@ -124,15 +126,13 @@ class ServiceService extends BaseService
         return $this->getResponseData();
     }
 
-    protected function uploadImage($request) {
-        $name = '';
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $name = $image->getClientOriginalName();
-            $destinationPath = public_path('/upload/images');
-            $image->move($destinationPath, $name);
-        }
-        return $name;
+    public function delete($id)
+    {
+        $this->serviceRep->destroy($id);
+        $this->setMessage('Xóa dịch vụ thành công');
+        $this->setStatusCode(Response::HTTP_OK);
+
+        return $this->getResponseData();
     }
 
 }

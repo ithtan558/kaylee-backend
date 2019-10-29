@@ -14,7 +14,7 @@ class AuthController extends Controller
 
     public function __construct(Request $request, AuthService $authServiceInstance)
     {
-        $this->request = $request;
+        $this->request     = $request;
         $this->authService = $authServiceInstance;
     }
 

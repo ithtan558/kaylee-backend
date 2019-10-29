@@ -8,14 +8,15 @@ class Role extends BaseModel
     const UPDATED_AT = 'updated_date';
 
     protected $table = 'role';
-    protected $fillable = [
-        'name',
-        'code',
-        'description',
-        'is_active',
-        'created_by',
-        'updated_by'
-    ];
+    protected $fillable
+        = [
+            'name',
+            'code',
+            'description',
+            'is_active',
+            'created_by',
+            'updated_by'
+        ];
 
     public function user()
     {

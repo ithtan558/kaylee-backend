@@ -144,7 +144,7 @@ class BaseRepository
     public function getKeyValue($key, $value)
     {
         $items = $this->all();
-        $data = array();
+        $data  = array();
         foreach ($items as $item) {
             $data[$item->$key] = $item->$value;
         }
@@ -153,10 +153,10 @@ class BaseRepository
 
     public function formatPagination(LengthAwarePaginator $data)
     {
-        $length = $data->perPage();
+        $length      = $data->perPage();
         $totalRecord = $data->total();
-        $result = [
-            'page' => $data->currentPage(),
+        $result      = [
+            'page'  => $data->currentPage(),
             'limit' => $length,
             'total' => $totalRecord,
             'pages' => ceil($totalRecord / $length),
@@ -191,12 +191,20 @@ class BaseRepository
                     if (strtolower(trim($compare)) == 'like') {
                         $val = '%' . $val . '%';
                     }
-                    $query->where(DB::raw($fieldSearch[$key]['field']), $compare, $val);
+                    if (is_array($fieldSearch[$key]['field'])) {
+                        foreach ($fieldSearch[$key]['field'] as $index => $item) {
+                            if ($index == 0) {
+                                $query->where(DB::raw($item), $compare, $val);
+                            } else {
+                                $query->orWhere(DB::raw($item), $compare, $val);
+                            }
+                        }
+                    }
 
                     break;
 
                 case 'date':
-                    $val = str_replace('"', '', $val);
+                    $val        = str_replace('"', '', $val);
                     $dateFormat = date('Y-m-d', strtotime($val));
                     $query->where(
                         DB::raw('DATE(' . $field . ')'), $fieldSearch[$key]['compare'], $dateFormat);
@@ -204,7 +212,7 @@ class BaseRepository
 
                 case 'array':
                     $delimiter = empty($fieldSearch[$key]['delimiter']) ? "," : $fieldSearch[$key]['delimiter'];
-                    $val = explode($delimiter, $val);
+                    $val       = explode($delimiter, $val);
                     $query->whereIn($field, $val);
                     break;
 
@@ -259,7 +267,7 @@ class BaseRepository
     public function getSortColumn($params, $defaultSorting = '', $sortableColumn = [])
     {
         $sortableField = $sortableColumn ? $sortableColumn : $this->model->getFillable();
-        $defaultField = $defaultSorting ? $defaultSorting : $this->model->getKeyName();
+        $defaultField  = $defaultSorting ? $defaultSorting : $this->model->getKeyName();
 
         return isset($params['sort']) && in_array($params['sort'], $sortableField) ? $params['sort'] : $defaultField;
     }

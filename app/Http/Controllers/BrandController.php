@@ -16,7 +16,7 @@ class BrandController extends Controller
 
     public function __construct(Request $request, BrandService $brandService)
     {
-        $this->request = $request;
+        $this->request      = $request;
         $this->brandService = $brandService;
     }
 
@@ -55,6 +55,13 @@ class BrandController extends Controller
         $this->validate($this->request, BrandUpdateValidator::rules(), BrandUpdateValidator::messages());
 
         $data = $this->brandService->update($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function delete($id)
+    {
+        $data = $this->brandService->delete($id);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }

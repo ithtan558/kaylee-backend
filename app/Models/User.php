@@ -15,31 +15,33 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     use Authenticatable, Authorizable, CanResetPassword;
 
     protected $table = 'user';
-    protected $fillable = [
-        'id',
-        'username',
-        'email',
-        'password',
-        'original_password',
-        'avatar',
-        'first_name',
-        'last_name',
-        'full_name',
-        'birthday',
-        'phone',
-        'address',
-        'gender',
-        'is_active',
-        'fax',
-        'website',
-        'created_by',
-        'updated_by'
-    ];
+    protected $fillable
+        = [
+            'id',
+            'username',
+            'email',
+            'password',
+            'original_password',
+            'avatar',
+            'first_name',
+            'last_name',
+            'full_name',
+            'birthday',
+            'phone',
+            'address',
+            'gender',
+            'is_active',
+            'fax',
+            'website',
+            'created_by',
+            'updated_by'
+        ];
 
-    protected $hidden = [
-        'password',
-        'original_password',
-    ];
+    protected $hidden
+        = [
+            'password',
+            'original_password',
+        ];
 
     public function getAuthPassword()
     {

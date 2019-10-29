@@ -14,7 +14,7 @@ class ServiceCategoryController extends Controller
 
     public function __construct(Request $request, ServiceCategoryService $serviceCategory)
     {
-        $this->request = $request;
+        $this->request         = $request;
         $this->serviceCategory = $serviceCategory;
     }
 

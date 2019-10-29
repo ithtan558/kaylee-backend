@@ -14,7 +14,7 @@ class CityController extends Controller
 
     public function __construct(Request $request, CityService $cityService)
     {
-        $this->request = $request;
+        $this->request     = $request;
         $this->cityService = $cityService;
     }
 
