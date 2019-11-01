@@ -18,6 +18,9 @@ class OrderCreateValidator implements AbstractValidator
      */
     public static function messages()
     {
-        return [];
+        return [
+            'cart_items.required' => 'Không có dịch vụ nào trong giỏ hàng.',
+            'name.array' => 'Không có dịch vụ nào trong giỏ hàng.'
+        ];
     }
 }

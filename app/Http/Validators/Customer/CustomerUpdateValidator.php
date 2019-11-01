@@ -22,6 +22,10 @@ class CustomerUpdateValidator implements AbstractValidator
      */
     public static function messages()
     {
-        return [];
+        return [
+            'name.required' => 'Tên bắt buộc.',
+            'phone.required' => 'Số điện thoại bắt buộc.',
+            'phone.unique' => 'Số điện thoại này đã có người sử dụng.'
+        ];
     }
 }
