@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Validators\Service\CustomerCreateValidator;
-use App\Http\Validators\Service\CustomerUpdateValidator;
+use App\Http\Validators\Service\ServiceCreateValidator;
+use App\Http\Validators\Service\ServiceUpdateValidator;
 use Illuminate\Http\Request;
 use App\Services\ServiceService;
 use App\Libraries\Api;
@@ -43,7 +43,7 @@ class ServiceController extends Controller
 
     public function create()
     {
-        $this->validate($this->request, CustomerCreateValidator::rules(), CustomerCreateValidator::messages());
+        $this->validate($this->request, ServiceCreateValidator::rules(), ServiceCreateValidator::messages());
 
         $data = $this->serviceService->create($this->request);
 
@@ -52,7 +52,7 @@ class ServiceController extends Controller
 
     public function update()
     {
-        $this->validate($this->request, CustomerUpdateValidator::rules(), CustomerUpdateValidator::messages());
+        $this->validate($this->request, ServiceUpdateValidator::rules(), ServiceUpdateValidator::messages());
 
         $data = $this->serviceService->update($this->request);
 
