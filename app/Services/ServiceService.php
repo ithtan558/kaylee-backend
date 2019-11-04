@@ -52,6 +52,7 @@ class ServiceService extends BaseService
     {
         try {
             $dataCreate = [
+                'client_id'   => $this->getCurrentUser('client_id'),
                 'name'        => $request['name'],
                 'code'        => $request['code'],
                 'description' => $request['description'],
@@ -99,8 +100,8 @@ class ServiceService extends BaseService
                 'updated_by'  => $this->getCurrentUser('id')
             ];
 
-            $name                = $this->uploadImage($request);
-            $dataCreate['image'] = $name;
+            $name                = '2132';
+            $dataUpdate['image'] = $name;
 
             $this->serviceRep->update($dataUpdate, $request['id']);
 
@@ -118,7 +119,7 @@ class ServiceService extends BaseService
             }
 
             $this->setMessage('Cập nhật dịch vụ thành công');
-            $this->setData($dataCreate);
+            $this->setData($dataUpdate);
         } catch (\Exception $ex) {
             $this->setMessage($ex->getMessage());
             $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);

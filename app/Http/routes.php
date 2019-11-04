@@ -21,6 +21,7 @@ $app->get('/', function () use ($app) {
 $app->get('/user-info', 'AuthController@getUserInfo');
 $app->get('/logout', 'AuthController@logout');
 $app->post('/login', 'AuthController@login');
+$app->post('/register', 'AuthController@register');
 
 // City
 $app->group([

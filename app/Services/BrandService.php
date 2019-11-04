@@ -52,6 +52,7 @@ class BrandService extends BaseService
     {
         try {
             $dataCreate = [
+                'client_id'        => $this->getCurrentUser('client_id'),
                 'name'        => $request['name'],
                 'phone'       => $request['phone'],
                 'location'    => $request['location'],

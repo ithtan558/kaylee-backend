@@ -8,6 +8,8 @@ class Brand extends BaseModel
     protected $table = 'brand';
     protected $fillable
         = [
+            'client_id',
+            'client_id',
             'name',
             'phone',
             'location',

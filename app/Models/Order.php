@@ -11,6 +11,7 @@ class Order extends BaseModel
 
     protected $fillable
         = [
+            'brand_id',
             'code',
             'customer_id',
             'order_status_id',

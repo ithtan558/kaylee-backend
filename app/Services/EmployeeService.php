@@ -4,24 +4,24 @@ namespace App\Services;
 
 use App\Helpers\CommonHelper;
 use App\Libraries\Api;
-use App\Repositories\CustomerRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class CustomerService extends BaseService
+class EmployeeService extends BaseService
 {
-    protected $customerRep;
+    protected $userRep;
 
     public function __construct(
-        CustomerRepository $customerRep
+        UserRepository $userRep
     )
     {
-        $this->customerRep = $customerRep;
+        $this->userRep = $userRep;
     }
 
     public function getAll()
     {
-        $data = $this->customerRep->getAll();
+        $data = $this->userRep->getAll();
         $this->setData($data);
 
         return $this->getResponseData();
@@ -29,7 +29,7 @@ class CustomerService extends BaseService
 
     public function getList(Request $request)
     {
-        $data = $this->customerRep->getList($request->all());
+        $data = $this->userRep->getList($request->all());
         $this->setData($data);
 
         return $this->getResponseData();
@@ -37,7 +37,7 @@ class CustomerService extends BaseService
 
     public function getByPhone(Request $request)
     {
-        $data = $this->customerRep->getByPhone($request->all());
+        $data = $this->userRep->getByPhone($request->all());
         $this->setData($data);
 
         return $this->getResponseData();
@@ -45,7 +45,7 @@ class CustomerService extends BaseService
 
     public function getDetail($id)
     {
-        $data = $this->customerRep->getDetail($id);
+        $data = $this->userRep->getDetail($id);
 
         $this->setData($data);
 
@@ -69,7 +69,7 @@ class CustomerService extends BaseService
                 $dataCreate['image'] = $name;
             }
 
-            $this->customerRep->create($dataCreate);
+            $this->userRep->create($dataCreate);
             $this->setMessage('Tạo khách hàng thành công');
             $this->setData($dataCreate);
         } catch (\Exception $ex) {
@@ -95,7 +95,7 @@ class CustomerService extends BaseService
                 $dataUpdate['image'] = $name;
             }
 
-            $this->customerRep->update($dataUpdate, $request['id']);
+            $this->userRep->update($dataUpdate, $request['id']);
             $this->setMessage('Cập nhật khách hàng thành công');
             $this->setData($dataUpdate);
         } catch (\Exception $ex) {
@@ -107,7 +107,7 @@ class CustomerService extends BaseService
 
     public function delete($id)
     {
-        $this->customerRep->destroy($id);
+        $this->userRep->destroy($id);
         $this->setMessage('Xóa khách hàng thành công');
         $this->setStatusCode(Response::HTTP_OK);
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\UserRepository;
 use App\Repositories\UserRoleRepository;
+use App\Repositories\ClientRepository;
 use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -15,11 +16,17 @@ class AuthService extends BaseService
 {
     protected $userRep;
     protected $userRoleRep;
+    protected $clientRep;
 
-    public function __construct(UserRepository $userRep, UserRoleRepository $userRoleRep)
+    public function __construct(
+        UserRepository $userRep,
+        UserRoleRepository $userRoleRep,
+        ClientRepository $clientRep
+    )
     {
         $this->userRep     = $userRep;
         $this->userRoleRep = $userRoleRep;
+        $this->clientRep   = $clientRep;
     }
 
     public function login(Request $request)
@@ -93,27 +100,37 @@ class AuthService extends BaseService
         return $this->getResponseData();
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $dataCreate = [
-            [
-                'is_master'         => 0,
-                'roles_id'          => 7,
-                'username'          => 'phd-internal',
-                'email'             => 'phd-internal@gmail.com',
-                'password'          => app('hash')->make('phd1234@'),
-                'original_password' => 'phd1234@',
-                'first_name'        => 'PHD',
-                'last_name'         => 'Internal',
-                'full_name'         => 'PHD Internal',
-                'birthday'          => '1995-01-01',
-                'phone'             => '012345678',
-                'address'           => 'Jakata',
-            ]
-        ];
-        foreach ($dataCreate as $data) {
 
-            $this->userRep->create($data);
-        }
+        // Create brand
+        $dataCreateBrand = [
+            'name'        => $request['name_client'],
+            'phone'       => $request['phone_client'],
+            'location'    => $request['location_client'],
+            'city_id'     => $request['city_id'],
+            'district_id' => $request['district_id']
+        ];
+        $client          = $this->clientRep->create($dataCreateBrand);
+
+        $dataCreateUser = [
+            'client_id' => $client->id,
+            'name'      => $request['name'],
+            'email'     => $request['email'],
+            'phone'     => $request['phone'],
+            'password'  => app('hash')->make($request['password'])
+        ];
+        $user           = $this->userRep->create($dataCreateUser);
+
+        $dataCreateRole = [
+            'user_id' => $user->id,
+            'role_id' => 1
+        ];
+        $this->userRoleRep->create($dataCreateRole);
+
+        $this->setMessage("Tạo cửa hàng thành công");
+
+        return $this->getResponseData();
+
     }
 }

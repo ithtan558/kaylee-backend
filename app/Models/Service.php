@@ -8,6 +8,7 @@ class Service extends BaseModel
     protected $table = 'service';
     protected $fillable
         = [
+            'client_id',
             'name',
             'code',
             'description',

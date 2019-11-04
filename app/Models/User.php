@@ -18,21 +18,17 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     protected $fillable
         = [
             'id',
+            'client_id',
             'username',
             'email',
             'password',
-            'original_password',
             'avatar',
-            'first_name',
-            'last_name',
-            'full_name',
+            'name',
             'birthday',
             'phone',
             'address',
             'gender',
             'is_active',
-            'fax',
-            'website',
             'created_by',
             'updated_by'
         ];

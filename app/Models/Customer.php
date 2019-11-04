@@ -8,6 +8,7 @@ class Customer extends BaseModel
     protected $table = 'customer';
     protected $fillable
         = [
+            'client_id',
             'name',
             'phone',
             'email',

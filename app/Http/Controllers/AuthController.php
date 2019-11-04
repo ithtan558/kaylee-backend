@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Validators\Auth\RegisterValidator;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Http\Validators\Auth\LoginValidator;
@@ -41,9 +42,10 @@ class AuthController extends Controller
     }
 
 
-    public function create()
+    public function register()
     {
-        $result = $this->authService->create();
-        return Api::response($result);
+        $this->validate($this->request, RegisterValidator::rules(), RegisterValidator::messages());
+        $data = $this->authService->create($this->request);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 }

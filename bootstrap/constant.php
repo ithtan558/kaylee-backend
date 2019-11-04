@@ -28,9 +28,15 @@ define('DIR_UPLOAD', '/upload/images');
 define('ORDER_STATUS_FINISHED', 1);
 define('ORDER_STATUS_ORDERED', 2);
 
-
 /*
  | define payment method
 ----------------------------------------------------------------------------
 */
 define('PAYMENT_METHOD_CASH', 1);
+
+/*
+ | define start and end time
+----------------------------------------------------------------------------
+*/
+define('START_TIME', '08:00');
+define('END_TIME', '22:00');

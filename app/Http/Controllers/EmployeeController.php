@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Validators\Brand\EmployeeCreateValidator;
-use App\Http\Validators\Brand\BrandUpdateValidator;
+use App\Http\Validators\Employee\EmployeeCreateValidator;
+use App\Http\Validators\Employee\EmployeeUpdateValidator;
 use Illuminate\Http\Request;
-use App\Services\BrandService;
+use App\Services\EmployeeService;
 use App\Libraries\Api;
 
-class BrandController extends Controller
+class EmployeeController extends Controller
 {
 
     protected $request;
-    protected $brandService;
+    protected $employeeService;
 
-    public function __construct(Request $request, BrandService $brandService)
+    public function __construct(Request $request, EmployeeService $employeeService)
     {
         $this->request      = $request;
-        $this->brandService = $brandService;
+        $this->employeeService = $employeeService;
     }
 
     public function getAll()
@@ -43,7 +43,7 @@ class BrandController extends Controller
 
     public function create()
     {
-        $this->validate($this->request, EmployeeCreateValidator::rules(), EmployeeCreateValidator::messages());
+        $this->validate($this->request, BrandCreateValidator::rules(), BrandCreateValidator::messages());
 
         $data = $this->brandService->create($this->request);
 
