@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Helpers\CommonHelper;
-use App\Libraries\Api;
 use App\Repositories\BrandRepository;
 use App\Repositories\BrandServiceRepository;
 use Illuminate\Http\Request;
@@ -25,6 +24,21 @@ class BrandService extends BaseService
 
     public function getAll()
     {
+        // Filter base on roles of user
+        $user = CommonHelper::getAuth();
+        $roles = [];
+        $reject_roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+        if (in_array(ROLE_SUPERADMIN, $roles)) {
+            $reject_roles = [ROLE_SUPERADMIN];
+        } else if (in_array(ROLE_MANAGER, $roles)) {
+            $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER];
+        } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
+            $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER, ROLE_BRAND_MANAGER];
+        }
+
         $data = $this->brandRep->getAll();
         $this->setData($data);
 
@@ -52,7 +66,7 @@ class BrandService extends BaseService
     {
         try {
             $dataCreate = [
-                'client_id'        => $this->getCurrentUser('client_id'),
+                'client_id'   => $this->getCurrentUser('client_id'),
                 'name'        => $request['name'],
                 'phone'       => $request['phone'],
                 'location'    => $request['location'],
@@ -66,7 +80,6 @@ class BrandService extends BaseService
 
             $name                = CommonHelper::uploadImage($request);
             $dataCreate['image'] = $name;
-
 
             $this->brandRep->create($dataCreate);
             $this->setMessage('Tạo chi nhánh thành công');

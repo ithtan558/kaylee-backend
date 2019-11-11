@@ -19,6 +19,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         = [
             'id',
             'client_id',
+            'brand_id',
             'username',
             'email',
             'password',
@@ -62,6 +63,11 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function user_roles()
+    {
+        return $this->hasMany(UserRole::class, 'user_id');
     }
 
 }

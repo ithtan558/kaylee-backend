@@ -43,6 +43,8 @@ class OrderService extends BaseService
         try {
             $items    = $request['cart_items'];
             $customer = $request['cart_customer'];
+            $discount = $request['cart_discount'];
+            $employee = $request['cart_employee'];
             // Check exist customer of not
             if (!empty($customer)) {
                 if (isset($customer['id'])) {
@@ -66,16 +68,19 @@ class OrderService extends BaseService
             }
 
             // Insert order
-
             $dataInsertOrder = [
+                'brand_id'   => $this->getCurrentUser('brand_id'),
+                'employee_id'     => $employee['id'],
                 'customer_id'     => $customer_id,
                 'order_status_id' => ORDER_STATUS_FINISHED,
                 'is_paid'         => 1,
                 'name'            => $customer['name'],
                 'phone'           => $customer['phone'],
                 'email'           => $customer['email'],
-                'note',
-                'amount'          => 0
+                'note'            => '',
+                'amount'          => 0,
+                'discount'        => 0,
+                'created_by'      => $this->getCurrentUser('id')
             ];
             $order           = $this->orderRep->create($dataInsertOrder);
 
@@ -108,8 +113,9 @@ class OrderService extends BaseService
 
             // Update amount for order
             $this->orderRep->update([
-                'amount' => $amount,
-                'code'   => CommonHelper::createRandomPassword($order['id'])
+                'amount'   => $amount - (($amount * $discount) / 100),
+                'discount' => ($amount * $discount) / 100,
+                'code'     => CommonHelper::createRandomPassword($order['id'])
             ],
                 $order['id']
             );
@@ -120,6 +126,22 @@ class OrderService extends BaseService
             $this->setMessage($ex->getMessage());
             $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        return $this->getResponseData();
+    }
+
+    public function getAll()
+    {
+        $data = $this->orderRep->getAll();
+        $this->setData($data);
+
+        return $this->getResponseData();
+    }
+
+    public function getCount()
+    {
+        $data = $this->orderRep->getCount();
+        $this->setData($data);
+
         return $this->getResponseData();
     }
 

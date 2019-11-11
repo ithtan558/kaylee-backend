@@ -103,15 +103,15 @@ class AuthService extends BaseService
     public function create(Request $request)
     {
 
-        // Create brand
-        $dataCreateBrand = [
+        // Create user
+        $dataCreateClient = [
             'name'        => $request['name_client'],
             'phone'       => $request['phone_client'],
             'location'    => $request['location_client'],
             'city_id'     => $request['city_id'],
             'district_id' => $request['district_id']
         ];
-        $client          = $this->clientRep->create($dataCreateBrand);
+        $client          = $this->clientRep->create($dataCreateClient);
 
         $dataCreateUser = [
             'client_id' => $client->id,
@@ -124,7 +124,7 @@ class AuthService extends BaseService
 
         $dataCreateRole = [
             'user_id' => $user->id,
-            'role_id' => 1
+            'role_id' => ROLE_SUPERADMIN
         ];
         $this->userRoleRep->create($dataCreateRole);
 

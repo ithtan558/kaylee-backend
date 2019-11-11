@@ -27,6 +27,13 @@ class CustomerController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
+    public function getCount()
+    {
+        $data = $this->customerService->getCount();
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
     public function getList()
     {
         $data = $this->customerService->getList($this->request);
@@ -34,9 +41,9 @@ class CustomerController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
-    public function getByPhoneAndName()
+    public function getByPhoneOrName()
     {
-        $data = $this->customerService->getByPhone($this->request);
+        $data = $this->customerService->getByPhoneOrName($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }

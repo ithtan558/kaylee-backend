@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Validators\Brand;
+namespace App\Http\Validators\Employee;
 
 use  App\Http\Validators\AbstractValidator;
 
@@ -10,8 +10,10 @@ class EmployeeCreateValidator implements AbstractValidator
     {
         return [
             'name'     => 'required',
+            'email'    => 'required|unique:user,email',
             'phone'    => 'required|numeric|unique:user,phone',
-            'location' => 'required',
+            'password' => 'required',
+            'role_id'  => 'required',
             'brand_id' => 'required'
         ];
     }
@@ -22,11 +24,16 @@ class EmployeeCreateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required'     => 'Tên bắt buộc.',
+            'name.required'     => 'Họ tên bắt buộc.',
+            'email.required'    => 'Email bắt buộc.',
+            'email.email'       => 'Email chưa đúng định dạng.',
+            'email.unique'      => 'Email đã tồn tại.',
             'phone.required'    => 'Số điện thoại bắt buộc.',
             'phone.unique'      => 'Số điện thoại đã tồn tại.',
-            'location.required' => 'Địa chỉ bắt buộc.',
-            'brand_id.required' => 'Thành phố bắt buộc.'
+            'phone.numeric'     => 'Số điện thoại chưa đúng định dạng.',
+            'password.required' => 'Mật khẩu bắt buộc.',
+            'role_id.required'  => 'Loại tài khoản bắt buộc.',
+            'brand_id.required' => 'Chi nhánh bắt buộc.'
         ];
     }
 }

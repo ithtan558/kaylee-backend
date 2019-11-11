@@ -40,3 +40,14 @@ define('PAYMENT_METHOD_CASH', 1);
 */
 define('START_TIME', '08:00');
 define('END_TIME', '22:00');
+
+/*
+ | define role id
+----------------------------------------------------------------------------
+*/
+define('ROLE_SUPERADMIN', 1);
+define('ROLE_MANAGER', 2);
+define('ROLE_BRAND_MANAGER', 3);
+define('ROLE_EMPLOYEE', 4);
+
+

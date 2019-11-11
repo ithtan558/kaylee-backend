@@ -27,6 +27,14 @@ class CustomerService extends BaseService
         return $this->getResponseData();
     }
 
+    public function getCount()
+    {
+        $data = $this->customerRep->getCount();
+        $this->setData($data);
+
+        return $this->getResponseData();
+    }
+
     public function getList(Request $request)
     {
         $data = $this->customerRep->getList($request->all());
@@ -35,9 +43,9 @@ class CustomerService extends BaseService
         return $this->getResponseData();
     }
 
-    public function getByPhone(Request $request)
+    public function getByPhoneOrName(Request $request)
     {
-        $data = $this->customerRep->getByPhone($request->all());
+        $data = $this->customerRep->getByPhoneOrName($request->all());
         $this->setData($data);
 
         return $this->getResponseData();
@@ -57,6 +65,7 @@ class CustomerService extends BaseService
         try {
             $dataCreate = [
                 'client_id'  => $this->getCurrentUser('client_id'),
+                'type_id'       => $request['type_id'],
                 'name'       => $request['name'],
                 'phone'      => $request['phone'],
                 'email'      => $request['email'],
@@ -83,6 +92,7 @@ class CustomerService extends BaseService
     {
         try {
             $dataUpdate = [
+                'type_id'       => $request['type_id'],
                 'name'       => $request['name'],
                 'phone'      => $request['phone'],
                 'email'      => $request['email'],

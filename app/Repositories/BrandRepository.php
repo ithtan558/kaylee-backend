@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Helpers\CommonHelper;
 use App\Models\Brand;
 use App\Models\User;
 
@@ -14,11 +15,26 @@ class BrandRepository extends BaseRepository
 
     public function getAll()
     {
-        $result = $this->model
+
+        // Filter base on roles of user
+        $user = CommonHelper::getAuth();
+        $roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+
+
+        $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE)
-            ->orderBy('id', 'DESC')
-            ->get();
+            ->where('is_active', STATUS_ACTIVE);
+
+        if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+            $query = $query->where('id', $user->brand_id);
+        } else if (in_array(ROLE_MANAGER, $roles)){
+            $query = $query->where('client_id', $user->client_id);
+        }
+
+        $result = $query->orderBy('id', 'DESC')->get();
 
         return $result;
     }

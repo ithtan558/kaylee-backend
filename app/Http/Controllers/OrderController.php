@@ -26,6 +26,13 @@ class OrderController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
+    public function getCount()
+    {
+        $data = $this->orderService->getCount();
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
     public function getList()
     {
         $data = $this->orderService->getList($this->request);

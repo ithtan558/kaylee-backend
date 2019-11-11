@@ -3,20 +3,23 @@
 namespace App\Services;
 
 use App\Helpers\CommonHelper;
-use App\Libraries\Api;
 use App\Repositories\UserRepository;
+use App\Repositories\UserRoleRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class EmployeeService extends BaseService
 {
     protected $userRep;
+    protected $userRoleRep;
 
     public function __construct(
-        UserRepository $userRep
+        UserRepository $userRep,
+        UserRoleRepository $userRoleRep
     )
     {
-        $this->userRep = $userRep;
+        $this->userRep     = $userRep;
+        $this->userRoleRep = $userRoleRep;
     }
 
     public function getAll()
@@ -35,9 +38,9 @@ class EmployeeService extends BaseService
         return $this->getResponseData();
     }
 
-    public function getByPhone(Request $request)
+    public function getByPhoneOrName(Request $request)
     {
-        $data = $this->userRep->getByPhone($request->all());
+        $data = $this->userRep->getByPhoneOrName($request->all());
         $this->setData($data);
 
         return $this->getResponseData();
@@ -54,61 +57,75 @@ class EmployeeService extends BaseService
 
     public function create(Request $request)
     {
-        try {
-            $dataCreate = [
-                'client_id'  => $this->getCurrentUser('client_id'),
-                'name'       => $request['name'],
-                'phone'      => $request['phone'],
-                'email'      => $request['email'],
-                'birthday'   => $request['birthday'],
-                'created_by' => $this->getCurrentUser('id')
-            ];
 
-            $name = CommonHelper::uploadImage($request);
-            if ($name) {
-                $dataCreate['image'] = $name;
-            }
+        $dataCreate = [
+            'client_id'  => $this->getCurrentUser('client_id'),
+            'name'       => $request['name'],
+            'email'      => $request['email'],
+            'phone'      => $request['phone'],
+            'password'   => app('hash')->make($request['password']),
+            'birthday'   => $request['birthday'],
+            'gender'     => $request['gender'],
+            'address'    => $request['address'],
+            'brand_id'    => $request['brand_id'],
+            'created_by' => $this->getCurrentUser('id')
+        ];
 
-            $this->userRep->create($dataCreate);
-            $this->setMessage('Tạo khách hàng thành công');
-            $this->setData($dataCreate);
-        } catch (\Exception $ex) {
-            $this->setMessage($ex->getMessage());
-            $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $name                = CommonHelper::uploadImage($request);
+        $dataCreate['avatar'] = $name;
+
+        $user = $this->userRep->create($dataCreate);
+
+        $dataCreateRole = [
+            'user_id' => $user->id,
+            'role_id' => ROLE_EMPLOYEE
+        ];
+        $this->userRoleRep->create($dataCreateRole);
+
+        $this->setMessage("Tạo nhân viên thành công");
+
         return $this->getResponseData();
+
     }
 
     public function update(Request $request)
     {
-        try {
-            $dataUpdate = [
-                'name'       => $request['name'],
-                'phone'      => $request['phone'],
-                'email'      => $request['email'],
-                'birthday'   => $request['birthday'],
-                'updated_by' => $this->getCurrentUser('id')
-            ];
 
-            $name = CommonHelper::uploadImage($request);
-            if ($name) {
-                $dataUpdate['image'] = $name;
-            }
+        $dataUpdate = [
+            'client_id'  => $this->getCurrentUser('client_id'),
+            'name'       => $request['name'],
+            'email'      => $request['email'],
+            'phone'      => $request['phone'],
+            'password'   => app('hash')->make($request['password']),
+            'birthday'   => $request['birthday'],
+            'gender'     => $request['gender'],
+            'address'    => $request['address'],
+            'brand_id'    => $request['brand_id'],
+            'created_by' => $this->getCurrentUser('id')
+        ];
 
-            $this->userRep->update($dataUpdate, $request['id']);
-            $this->setMessage('Cập nhật khách hàng thành công');
-            $this->setData($dataUpdate);
-        } catch (\Exception $ex) {
-            $this->setMessage($ex->getMessage());
-            $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $name                = CommonHelper::uploadImage($request);
+        $dataUpdate['avatar'] = $name;
+
+        $this->userRep->update($dataUpdate, $request['id']);
+
+        $this->userRoleRep->deleteByUserId($request['id']);
+        $dataCreateRole = [
+            'user_id' => $request['id'],
+            'role_id' => ROLE_EMPLOYEE
+        ];
+        $this->userRoleRep->create($dataCreateRole);
+
+        $this->setMessage("Sửa nhân viên thành công");
+
         return $this->getResponseData();
+
     }
 
     public function delete($id)
     {
         $this->userRep->destroy($id);
-        $this->setMessage('Xóa khách hàng thành công');
+        $this->setMessage('Xóa nhân viên thành công');
         $this->setStatusCode(Response::HTTP_OK);
 
         return $this->getResponseData();

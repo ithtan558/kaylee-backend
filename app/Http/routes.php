@@ -23,6 +23,14 @@ $app->get('/logout', 'AuthController@logout');
 $app->post('/login', 'AuthController@login');
 $app->post('/register', 'AuthController@register');
 
+// Role
+$app->group([
+    'prefix'    => "/role",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->get('/all', 'RoleController@getAll');
+});
+
 // City
 $app->group([
     'prefix'    => "/city",
@@ -85,13 +93,21 @@ $app->group([
 ], function () use ($app) {
     $app->post('/', 'CustomerController@create');
     $app->get('/all', 'CustomerController@getAll');
-    $app->get('/get-by-phone-and-name', 'CustomerController@getByPhoneAndName');
+    $app->get('/get-count', 'CustomerController@getCount');
+    $app->get('/get-by-phone-and-name', 'CustomerController@getByPhoneOrName');
     $app->get('/{id}', 'CustomerController@getDetail');
     $app->post('/{id}', 'CustomerController@update');
     $app->get('/', 'CustomerController@getList');
     $app->delete('/delete/{id}', 'ServiceController@delete');
 });
 
+// Customer type
+$app->group([
+    'prefix'    => "/customer-type",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->get('/all', 'CustomerTypeController@getAll');
+});
 
 // Order
 $app->group([
@@ -100,11 +116,24 @@ $app->group([
 ], function () use ($app) {
     $app->post('/', 'OrderController@create');
     $app->get('/all', 'OrderController@getAll');
+    $app->get('/get-count', 'OrderController@getCount');
     $app->get('/{id}', 'OrderController@getDetail');
     $app->post('/{id}', 'OrderController@update');
     $app->get('/', 'OrderController@getList');
 });
 
+// Employee
+$app->group([
+    'prefix'    => "/employee",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->post('/', 'EmployeeController@create');
+    $app->get('/all', 'EmployeeController@getAll');
+    $app->get('/get-by-phone-and-name', 'EmployeeController@getByPhoneOrName');
+    $app->get('/{id}', 'EmployeeController@getDetail');
+    $app->post('/{id}', 'EmployeeController@update');
+    $app->get('/', 'EmployeeController@getList');
+});
 
 
 

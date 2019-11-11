@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\BrandService;
 use App\Models\Role;
 use App\Models\UserRole;
 use Illuminate\Support\Facades\DB;
@@ -28,5 +29,12 @@ class UserRoleRepository extends BaseRepository
             ->join(Role::getTbl(), Role::getCol("id"), "=", UserRole::getCol("role_id"))
             ->where(UserRole::getCol("user_id"), $userId)
             ->get();
+    }
+
+    public function deleteByUserId($userId)
+    {
+        return $this->model
+            ->where(UserRole::getCol('user_id'), $userId)
+            ->delete();
     }
 }

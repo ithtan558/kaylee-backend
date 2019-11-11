@@ -25,12 +25,12 @@ class BrandUpdateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required' => 'Tên bắt buộc.',
-            'phone.required' => 'Số điện thoại bắt buộc.',
-            'city_id.required' => 'Thành phố bắt buộc.',
+            'name.required'        => 'Tên bắt buộc.',
+            'phone.required'       => 'Số điện thoại bắt buộc.',
+            'city_id.required'     => 'Thành phố bắt buộc.',
             'district_id.required' => 'Quận bắt buộc.',
-            'start_time.required' => 'Giờ mở cửa bắt buộc.',
-            'end_time.required' => 'Giờ đóng cửa bắt buộc.'
+            'start_time.required'  => 'Giờ mở cửa bắt buộc.',
+            'end_time.required'    => 'Giờ đóng cửa bắt buộc.'
         ];
     }
 }
