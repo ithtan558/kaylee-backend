@@ -124,7 +124,7 @@ class AuthService extends BaseService
 
         $dataCreateRole = [
             'user_id' => $user->id,
-            'role_id' => ROLE_SUPERADMIN
+            'role_id' => ROLE_MANAGER
         ];
         $this->userRoleRep->create($dataCreateRole);
 
