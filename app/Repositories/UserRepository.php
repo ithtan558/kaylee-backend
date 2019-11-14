@@ -39,6 +39,9 @@ class UserRepository extends BaseRepository
 
     public function getList($params)
     {
+        $order  = 'id';
+        $length = $this->getLength($params);
+        $sort   = $this->getOrder($params);
 
         $query = $this->model->select("*");
 
@@ -54,6 +57,8 @@ class UserRepository extends BaseRepository
         } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
             $query = $query->where('brand_id', $user->brand_id);
         }
+        $query = $query->orderBy($order, $sort)
+            ->paginate($length);
 
         return $this->formatPagination($query);
     }

@@ -10,7 +10,6 @@ class EmployeeCreateValidator implements AbstractValidator
     {
         return [
             'name'     => 'required',
-            'email'    => 'required|unique:user,email',
             'phone'    => 'required|numeric|unique:user,phone',
             'password' => 'required',
             'role_id'  => 'required',
@@ -25,9 +24,6 @@ class EmployeeCreateValidator implements AbstractValidator
     {
         return [
             'name.required'     => 'Họ tên bắt buộc.',
-            'email.required'    => 'Email bắt buộc.',
-            'email.email'       => 'Email chưa đúng định dạng.',
-            'email.unique'      => 'Email đã tồn tại.',
             'phone.required'    => 'Số điện thoại bắt buộc.',
             'phone.unique'      => 'Số điện thoại đã tồn tại.',
             'phone.numeric'     => 'Số điện thoại chưa đúng định dạng.',

@@ -44,9 +44,6 @@ class BrandRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model
-            ->select("*");
-
         // Filter base on roles of user
         $user = CommonHelper::getAuth();
         $roles = [];

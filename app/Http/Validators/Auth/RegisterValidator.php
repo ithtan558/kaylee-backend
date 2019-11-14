@@ -10,7 +10,6 @@ class RegisterValidator implements AbstractValidator
     {
         return [
             'name'            => 'required',
-            'email'           => 'required|unique:user,email',
             'name_client'     => 'required',
             'location_client' => 'required',
             'phone_client'    => 'required|numeric',
@@ -28,9 +27,6 @@ class RegisterValidator implements AbstractValidator
     {
         return [
             'name.required'            => 'Họ tên bắt buộc.',
-            'email.required'           => 'Email bắt buộc.',
-            'email.email'              => 'Email chưa đúng định dạng.',
-            'email.unique'             => 'Email đã tồn tại.',
             'name_client.required'     => 'Tên cửa hàng bắt buộc.',
             'location_client.required' => 'Địa chỉ cửa hàng bắt buộc.',
             'phone_client.required'    => 'Số điện thoại cửa hàng bắt buộc.',
