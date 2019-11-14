@@ -23,7 +23,6 @@ class BrandRepository extends BaseRepository
             $roles[] = $role->role_id;
         }
 
-
         $query = $this->model
             ->select('*')
             ->where('is_active', STATUS_ACTIVE);
@@ -46,8 +45,27 @@ class BrandRepository extends BaseRepository
         $sort   = $this->getOrder($params);
 
         $query = $this->model
-            ->select("*")
-            ->orderBy($order, $sort)
+            ->select("*");
+
+        // Filter base on roles of user
+        $user = CommonHelper::getAuth();
+        $roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+
+        $query = $this->model
+            ->select('*')
+            ->where('is_active', STATUS_ACTIVE);
+
+        if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+            $query = $query->where('id', $user->brand_id);
+        } else if (in_array(ROLE_MANAGER, $roles)){
+            $query = $query->where('client_id', $user->client_id);
+        }
+
+
+        $query = $query->orderBy($order, $sort)
             ->paginate($length);
 
         return $this->formatPagination($query);

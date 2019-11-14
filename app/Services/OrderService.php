@@ -69,7 +69,7 @@ class OrderService extends BaseService
 
             // Insert order
             $dataInsertOrder = [
-                'brand_id'   => $this->getCurrentUser('brand_id'),
+                'brand_id'        => $this->getCurrentUser('brand_id'),
                 'employee_id'     => $employee['id'],
                 'customer_id'     => $customer_id,
                 'order_status_id' => ORDER_STATUS_FINISHED,

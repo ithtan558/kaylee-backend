@@ -39,14 +39,21 @@ class UserRepository extends BaseRepository
 
     public function getList($params)
     {
-        $order  = 'id';
-        $length = $this->getLength($params);
-        $sort   = $this->getOrder($params);
 
-        $query = $this->model
-            ->select("*")
-            ->orderBy($order, $sort)
-            ->paginate($length);
+        $query = $this->model->select("*");
+
+        // Filter base on roles of user
+        $user  = CommonHelper::getAuth();
+        $roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+
+        if (in_array(ROLE_MANAGER, $roles)) {
+            $query = $query->where('client_id', $user->client_id);
+        } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
+            $query = $query->where('brand_id', $user->brand_id);
+        }
 
         return $this->formatPagination($query);
     }

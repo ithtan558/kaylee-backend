@@ -24,20 +24,6 @@ class BrandService extends BaseService
 
     public function getAll()
     {
-        // Filter base on roles of user
-        $user = CommonHelper::getAuth();
-        $roles = [];
-        $reject_roles = [];
-        foreach ($user->user_roles as $role) {
-            $roles[] = $role->role_id;
-        }
-        if (in_array(ROLE_SUPERADMIN, $roles)) {
-            $reject_roles = [ROLE_SUPERADMIN];
-        } else if (in_array(ROLE_MANAGER, $roles)) {
-            $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER];
-        } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
-            $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER, ROLE_BRAND_MANAGER];
-        }
 
         $data = $this->brandRep->getAll();
         $this->setData($data);

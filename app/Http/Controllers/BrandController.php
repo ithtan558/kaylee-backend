@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Validators\Brand\EmployeeCreateValidator;
+use App\Http\Validators\Brand\BrandCreateValidator;
 use App\Http\Validators\Brand\BrandUpdateValidator;
 use Illuminate\Http\Request;
 use App\Services\BrandService;
@@ -43,7 +43,7 @@ class BrandController extends Controller
 
     public function create()
     {
-        $this->validate($this->request, EmployeeCreateValidator::rules(), EmployeeCreateValidator::messages());
+        $this->validate($this->request, BrandCreateValidator::rules(), BrandCreateValidator::messages());
 
         $data = $this->brandService->create($this->request);
 
