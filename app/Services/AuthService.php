@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRoleRepository;
 use App\Repositories\ClientRepository;
+use App\Repositories\BrandRepository;
 use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -17,16 +18,19 @@ class AuthService extends BaseService
     protected $userRep;
     protected $userRoleRep;
     protected $clientRep;
+    protected $brandRep;
 
     public function __construct(
         UserRepository $userRep,
         UserRoleRepository $userRoleRep,
-        ClientRepository $clientRep
+        ClientRepository $clientRep,
+        BrandRepository $brandRep
     )
     {
         $this->userRep     = $userRep;
         $this->userRoleRep = $userRoleRep;
         $this->clientRep   = $clientRep;
+        $this->brandRep    = $brandRep;
     }
 
     public function login(Request $request)
@@ -103,7 +107,7 @@ class AuthService extends BaseService
     public function create(Request $request)
     {
 
-        // Create user
+        // Create client
         $dataCreateClient = [
             'name'        => $request['name_client'],
             'phone'       => $request['phone_client'],
@@ -111,10 +115,25 @@ class AuthService extends BaseService
             'city_id'     => $request['city_id'],
             'district_id' => $request['district_id']
         ];
-        $client          = $this->clientRep->create($dataCreateClient);
+        $client           = $this->clientRep->create($dataCreateClient);
 
+        // Create Brand
+        $dataCreateBrand = [
+            'client_id'   => $client->id,
+            'name'        => $request['name_client'],
+            'phone'       => $request['phone_client'],
+            'location'    => $request['location_client'],
+            'city_id'     => $request['city_id'],
+            'district_id' => $request['district_id'],
+            'start_time'  => START_TIME,
+            'end_time'    => END_TIME
+        ];
+        $brand           = $this->brandRep->create($dataCreateBrand);
+
+        // Create user
         $dataCreateUser = [
             'client_id' => $client->id,
+            'brand_id'  => $brand->id,
             'name'      => $request['name'],
             'email'     => $request['email'],
             'phone'     => $request['phone'],

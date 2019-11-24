@@ -30,10 +30,8 @@ class OrderRepository extends BaseRepository
             $roles[] = $role->role_id;
         }
 
-        if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles)) {
             $query = $query->where('brand_id', $user->brand_id);
-        } else if (in_array(ROLE_MANAGER, $roles)){
-            $query = $query->where('client_id', $user->client_id);
         }
 
         $query = $query->orderBy($order, $sort)

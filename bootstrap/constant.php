@@ -50,4 +50,11 @@ define('ROLE_MANAGER', 2);
 define('ROLE_BRAND_MANAGER', 3);
 define('ROLE_EMPLOYEE', 4);
 
+/*
+ | define type customer
+----------------------------------------------------------------------------
+*/
+define('CUSTOMER_VIP', 1);
+define('CUSTOMER_NORMAL', 2);
+
 

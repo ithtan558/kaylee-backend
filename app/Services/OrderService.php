@@ -51,9 +51,11 @@ class OrderService extends BaseService
                     $customer_id = $customer['id'];
                 } else {
                     $dataInsertCustomer = [
-                        'name'  => $customer['name'],
-                        'phone' => $customer['phone'],
-                        'email' => $customer['email']
+                        'client_id' => $this->getCurrentUser('client_id'),
+                        'name'      => $customer['name'],
+                        'phone'     => $customer['phone'],
+                        'email'     => $customer['email'],
+                        'type_id'   => CUSTOMER_NORMAL
                     ];
                     $customer           = $this->customerRep->create($dataInsertCustomer);
                     $customer_id        = $customer['id'];

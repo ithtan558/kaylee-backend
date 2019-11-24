@@ -78,7 +78,7 @@ class EmployeeService extends BaseService
 
         $dataCreateRole = [
             'user_id' => $user->id,
-            'role_id' => ROLE_EMPLOYEE
+            'role_id' => $request['role_id']
         ];
         $this->userRoleRep->create($dataCreateRole);
 
@@ -112,7 +112,7 @@ class EmployeeService extends BaseService
         $this->userRoleRep->deleteByUserId($request['id']);
         $dataCreateRole = [
             'user_id' => $request['id'],
-            'role_id' => ROLE_EMPLOYEE
+            'role_id' => $request['role_id']
         ];
         $this->userRoleRep->create($dataCreateRole);
 

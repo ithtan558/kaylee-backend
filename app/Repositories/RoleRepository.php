@@ -24,7 +24,7 @@ class RoleRepository extends BaseRepository
         if (in_array(ROLE_SUPERADMIN, $roles)) {
             $reject_roles = [ROLE_SUPERADMIN];
         } else if (in_array(ROLE_MANAGER, $roles)) {
-            $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER];
+            $reject_roles = [ROLE_SUPERADMIN];
         } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
             $reject_roles = [ROLE_SUPERADMIN, ROLE_MANAGER, ROLE_BRAND_MANAGER];
         }
