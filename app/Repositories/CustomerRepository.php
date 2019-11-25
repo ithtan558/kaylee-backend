@@ -52,6 +52,15 @@ class CustomerRepository extends BaseRepository
         $sort   = $this->getOrder($params);
 
         $query = $this->model->select(Customer::getCol('*'));
+        // Filter base on roles of user
+        $user  = CommonHelper::getAuth();
+        $roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+            $query = $query->where('client_id', $user->client_id);
+        }
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         $query = $query->orderBy($order, $sort)

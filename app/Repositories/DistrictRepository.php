@@ -16,7 +16,7 @@ class DistrictRepository extends BaseRepository
         $result = $this->model
             ->select('*')
             ->where('is_active', STATUS_ACTIVE)
-            ->orderBy('id', 'DESC')
+            ->orderBy('sequence', 'ASC')
             ->get();
 
         return $result;
@@ -28,7 +28,7 @@ class DistrictRepository extends BaseRepository
             ->select('*')
             ->where('is_active', STATUS_ACTIVE)
             ->where('city_id', $city_id)
-            ->orderBy('id', 'DESC')
+            ->orderBy('sequence', 'ASC')
             ->get();
 
         return $result;

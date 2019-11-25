@@ -16,7 +16,7 @@ class CityRepository extends BaseRepository
         $result = $this->model
             ->select('*')
             ->where('is_active', STATUS_ACTIVE)
-            ->orderBy('id', 'DESC')
+            ->orderBy('name', 'DESC')
             ->get();
 
         return $result;

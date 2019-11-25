@@ -21,7 +21,8 @@ class Order extends BaseModel
             'phone',
             'email',
             'note',
-            'amount'
+            'amount',
+            'discount'
         ];
 
     public function order_details()

@@ -14,7 +14,8 @@ class BrandCreateValidator implements AbstractValidator
             'city_id'     => 'required',
             'district_id' => 'required',
             'start_time'  => 'required',
-            'end_time'    => 'required'
+            'end_time'    => 'required',
+            'image'       => 'mimes:jpeg,jpg,png',
         ];
     }
 
@@ -30,6 +31,7 @@ class BrandCreateValidator implements AbstractValidator
             'district_id.required' => 'Quận bắt buộc.',
             'start_time.required'  => 'Giờ mở cửa bắt buộc.',
             'end_time.required'    => 'Giờ đóng cửa bắt buộc.',
+            'image.mimes'          => 'Hình ảnh chưa đúng định dạng.'
         ];
     }
 }

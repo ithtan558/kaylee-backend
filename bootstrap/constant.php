@@ -19,7 +19,7 @@ define('DATA_KEY', 'data');
 define('STATUS_KEY', 'status');
 
 // Dir Upload file
-define('DIR_UPLOAD', '/upload/images');
+define('DIR_UPLOAD', '/upload/images/');
 
 /*
  | define order status MMAP

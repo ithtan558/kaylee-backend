@@ -71,6 +71,7 @@ $app->group([
     $app->get('/{id}', 'ServiceCategoryController@getDetail');
     $app->post('/{id}', 'ServiceCategoryController@update');
     $app->get('/', 'ServiceCategoryController@getList');
+    $app->delete('/delete/{id}', 'ServiceCategoryController@delete');
 });
 
 // Service

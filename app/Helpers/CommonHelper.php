@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class CommonHelper
 {
@@ -90,14 +91,15 @@ class CommonHelper
 
     public static function uploadImage($request)
     {
-        $name = '';
+        $filename = '';
         if ($request->hasFile('image')) {
             $image           = $request->file('image');
-            $name            = $image->getClientOriginalName();
-            $destinationPath = public_path(DIR_UPLOAD);
-            $image->move($destinationPath, $name);
+            $filename = $image->getClientOriginalName();
+            $image_resize = Image::make($image->getRealPath());
+            $image_resize->resize(400, 400);
+            $image_resize->save(public_path(DIR_UPLOAD .$filename));
         }
-        return $name;
+        return $filename;
     }
 
     public static function createRandomPassword($id)

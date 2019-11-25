@@ -62,7 +62,7 @@ $app->singleton(
  $app->middleware([
     App\Http\Middleware\CorsMiddleware::class
  ]);
- 
+
 $app->routeMiddleware([
     'jwt.auth'=> App\Middleware\JwtAuthMiddleware::class,
 ]);
@@ -87,6 +87,7 @@ $app->configure('jwt');
 $app->alias('JWTAuth', \Tymon\JWTAuth\Facades\JWTAuth::class);
 $app->alias('JWTFactory', Tymon\JWTAuth\Facades\JWTFactory::class);
 $app->alias('config', \Illuminate\Support\Facades\Config::class);
+$app->alias('JWTAuth', \Intervention\Image\ImageServiceProvider::class);
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
