@@ -34,8 +34,8 @@ class RegisterValidator implements AbstractValidator
             'city_id.numeric'          => 'Thành phố bắt buộc.',
             'district_id.required'     => 'Quận/Huyện bắt buộc.',
             'district_id.numeric'      => 'Quận/Huyện bắt buộc.',
-            'phone.required'           => 'Số điện thoại bắt buộc.',
-            'phone.unique'             => 'Số điện thoại đã tồn tại.',
+            'phone.required'           => 'Số điện thoại đăng nhập bắt buộc.',
+            'phone.unique'             => 'Số điện thoại đăng nhập đã tồn tại.',
             'phone.numeric'            => 'Số điện thoại chưa đúng định dạng.',
             'password.required'        => 'Mật khẩu bắt buộc.'
         ];

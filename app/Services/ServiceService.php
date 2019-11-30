@@ -56,7 +56,7 @@ class ServiceService extends BaseService
                 'name'        => $request['name'],
                 'code'        => $request['code'],
                 'description' => $request['description'],
-                'category_id' => $request['category_id'],
+                /*'category_id' => $request['category_id'],*/
                 'time'        => $request['time'],
                 'price'       => $request['price'],
                 'is_active'   => STATUS_ACTIVE,
@@ -93,14 +93,14 @@ class ServiceService extends BaseService
                 'name'        => $request['name'],
                 'code'        => $request['code'],
                 'description' => $request['description'],
-                'category_id' => $request['category_id'],
+                /*'category_id' => $request['category_id'],*/
                 'time'        => $request['time'],
                 'price'       => $request['price'],
                 'is_active'   => STATUS_ACTIVE,
                 'updated_by'  => $this->getCurrentUser('id')
             ];
 
-            $name                = '2132';
+            $name                = CommonHelper::uploadImage($request);
             $dataUpdate['image'] = $name;
 
             $this->serviceRep->update($dataUpdate, $request['id']);

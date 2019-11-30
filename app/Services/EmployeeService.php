@@ -61,10 +61,10 @@ class EmployeeService extends BaseService
         $dataCreate = [
             'client_id'  => $this->getCurrentUser('client_id'),
             'name'       => $request['name'],
-            'email'      => $request['email'],
+            /*'email'      => $request['email'],*/
             'phone'      => $request['phone'],
             'password'   => app('hash')->make($request['password']),
-            'birthday'   => $request['birthday'],
+            /*'birthday'   => $request['birthday'],*/
             'gender'     => $request['gender'],
             'address'    => $request['address'],
             'brand_id'    => $request['brand_id'],
@@ -94,10 +94,10 @@ class EmployeeService extends BaseService
         $dataUpdate = [
             'client_id'  => $this->getCurrentUser('client_id'),
             'name'       => $request['name'],
-            'email'      => $request['email'],
+            /*'email'      => $request['email'],*/
             'phone'      => $request['phone'],
             'password'   => app('hash')->make($request['password']),
-            'birthday'   => $request['birthday'],
+            /*'birthday'   => $request['birthday'],*/
             'gender'     => $request['gender'],
             'address'    => $request['address'],
             'brand_id'    => $request['brand_id'],

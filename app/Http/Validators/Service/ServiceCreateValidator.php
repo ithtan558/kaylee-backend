@@ -12,7 +12,7 @@ class ServiceCreateValidator implements AbstractValidator
             'name'        => 'required',
             'code'        => 'required',
             'brand_ids'   => 'required',
-            'category_id' => 'required|integer',
+            /*'category_id' => 'required|integer',*/
             'time'        => 'required',
             'price'       => 'required'
         ];
@@ -27,7 +27,7 @@ class ServiceCreateValidator implements AbstractValidator
             'name.required'       => 'Tên bắt buộc.',
             'code.required'       => 'Mã bắt buộc.',
             'brand_ids.required'  => 'Của hàng bắt buộc.',
-            'category_id.integer' => 'Loại dịch vụ bắt buộc.',
+            /*'category_id.integer' => 'Loại dịch vụ bắt buộc.',*/
             'time.required'       => 'Thời gian làm dịch vụ bắt buộc.',
             'price.required'      => 'Giá bắt buộc.'
         ];

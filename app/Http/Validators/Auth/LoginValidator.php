@@ -9,8 +9,8 @@ class LoginValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'account'  => 'required|min:3',
-            'password' => 'required|min:3'
+            'account'  => 'required',
+            'password' => 'required'
         ];
     }
 
@@ -20,8 +20,8 @@ class LoginValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'account.required'  => 'Xin vui lòng điền đầy đủ thông tin',
-            'password.required' => 'Xin vui lòng điền đầy đủ thông tin'
+            'account.required'  => 'Tài khoản không chính xác1.',
+            'password.required' => 'Tài khoản không chính xác2.'
         ];
     }
 }

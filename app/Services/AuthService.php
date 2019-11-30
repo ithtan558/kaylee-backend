@@ -42,7 +42,7 @@ class AuthService extends BaseService
         ];
 
         if (!$token = JWTAuth::attempt($credentials, ['exp' => 84600])) {
-            $msg = 'Tài khoản và mật khẩu không đúng';
+            $msg = 'Tài khoản không chính xác.';
             abort(Response::HTTP_BAD_REQUEST, $msg);
         }
 
