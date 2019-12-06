@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Validators\Order\OrderCreateValidator;
+use App\Http\Validators\Order\ReportTotalValidator;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use App\Libraries\Api;

@@ -136,5 +136,15 @@ $app->group([
     $app->get('/', 'EmployeeController@getList');
 });
 
+// Report
+$app->group([
+    'prefix'    => "/report",
+    'namespace' => $namespace
+], function () use ($app) {
+    $app->get('/get-total', 'ReportController@getTotal');
+    $app->get('/get-total-by-employee-date', 'ReportController@getTotalByEmployeeAndDate');
+    $app->get('/get-total-by-service-date', 'ReportController@getTotalByServiceAndDate');
+});
+
 
 
