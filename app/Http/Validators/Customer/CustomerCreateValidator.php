@@ -11,7 +11,7 @@ class CustomerCreateValidator implements AbstractValidator
         return [
             'name'  => 'required',
             'phone' => 'required|unique:customer,phone',
-            'email' => 'unique:customer,email'
+            /*'email' => 'unique:customer,email'*/
         ];
     }
 
@@ -24,7 +24,7 @@ class CustomerCreateValidator implements AbstractValidator
             'name.required'  => 'Tên bắt buộc.',
             'phone.required' => 'Số điện thoại bắt buộc.',
             'phone.unique'   => 'Số điện thoại này đã có người sử dụng.',
-            'email.unique'   => 'Email này đã có người sử dụng.'
+            /*'email.unique'   => 'Email này đã có người sử dụng.'*/
         ];
     }
 }

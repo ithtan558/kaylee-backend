@@ -169,7 +169,8 @@ class OrderRepository extends BaseRepository
 
         $query = $this->model
             ->select(
-                DB::raw('SUM('.Order::getCol('amount').') as amount'),
+                DB::raw('SUM('.OrderDetail::getCol('price').') as price'),
+                DB::raw('SUM('.OrderDetail::getCol('quantity').') as quantity'),
                 Service::getCol('name')
             )
             ->from(OrderDetail::getTbl())
@@ -187,6 +188,10 @@ class OrderRepository extends BaseRepository
 
         $result = $query->orderBy(Order::getCol('id'), 'DESC')
             ->groupBy(OrderDetail::getCol('service_id'))->get();
+
+        foreach ($result as &$item) {
+            $item->amount = $item->price * $item->quantity;
+        }
 
         return $result;
 
