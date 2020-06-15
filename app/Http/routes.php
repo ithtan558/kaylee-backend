@@ -20,6 +20,8 @@ $app->get('/', function () use ($app) {
 // Authentication user
 $app->get('/user-info', 'AuthController@getUserInfo');
 $app->get('/logout', 'AuthController@logout');
+$app->post('/forgot/verify-phone-and-send-otp', 'AuthController@verifyPhoneAndSendOtp');
+$app->post('/forgot/verify-otp', 'AuthController@verifyOtp');
 $app->post('/login', 'AuthController@login');
 $app->post('/register', 'AuthController@register');
 

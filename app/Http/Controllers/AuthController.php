@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Validators\Auth\RegisterValidator;
+use App\Http\Validators\Auth\VerifyOtpValidator;
+use App\Http\Validators\Auth\VerifyPhoneAndSendOtpValidator;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Http\Validators\Auth\LoginValidator;
@@ -30,6 +32,22 @@ class AuthController extends Controller
     public function logout()
     {
         $data = $this->authService->logout();
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function verifyPhoneAndSendOtp()
+    {
+        $this->validate($this->request, VerifyPhoneAndSendOtpValidator::rules(), VerifyPhoneAndSendOtpValidator::messages());
+        $data = $this->authService->verifyPhoneAndSendOtp($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function verifyOtp()
+    {
+        $this->validate($this->request, VerifyOtpValidator::rules(), VerifyOtpValidator::messages());
+        $data = $this->authService->verifyOtp($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }

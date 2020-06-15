@@ -76,6 +76,15 @@ class UserRepository extends BaseRepository
         return $query;
     }
 
+    public function verifyByPhone($phone)
+    {
+        $query = $this->model
+            ->where('phone', $phone)
+            ->first();
+
+        return $query;
+    }
+
     public function getByPhoneOrName($params)
     {
         $order = 'id';

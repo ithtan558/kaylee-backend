@@ -57,4 +57,16 @@ define('ROLE_EMPLOYEE', 4);
 define('CUSTOMER_VIP', 1);
 define('CUSTOMER_NORMAL', 2);
 
+/*
+ | define name auto when register at first time
+----------------------------------------------------------------------------
+*/
+define('NAME_REGISTER', 'Chi nhánh của bạn');
+
+/*
+ | define default otp
+----------------------------------------------------------------------------
+*/
+define('DEFAULT_NUMBER_OTP', '0000');
+
 

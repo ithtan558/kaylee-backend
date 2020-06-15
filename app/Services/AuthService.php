@@ -6,6 +6,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\UserRoleRepository;
 use App\Repositories\ClientRepository;
 use App\Repositories\BrandRepository;
+use App\Repositories\OtpRepository;
 use Illuminate\Http\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -19,18 +20,21 @@ class AuthService extends BaseService
     protected $userRoleRep;
     protected $clientRep;
     protected $brandRep;
+    protected $otpRep;
 
     public function __construct(
         UserRepository $userRep,
         UserRoleRepository $userRoleRep,
         ClientRepository $clientRep,
-        BrandRepository $brandRep
+        BrandRepository $brandRep,
+        OtpRepository $otpRep
     )
     {
         $this->userRep     = $userRep;
         $this->userRoleRep = $userRoleRep;
         $this->clientRep   = $clientRep;
         $this->brandRep    = $brandRep;
+        $this->otpRep      = $otpRep;
     }
 
     public function login(Request $request)
@@ -42,7 +46,7 @@ class AuthService extends BaseService
         ];
 
         if (!$token = JWTAuth::attempt($credentials, ['exp' => 84600])) {
-            $msg = 'Tài khoản không chính xác.';
+            $msg = 'Số điện thoại hoặc mật khẩu không có thực. Vui lòng nhập lại.';
             abort(Response::HTTP_BAD_REQUEST, $msg);
         }
 
@@ -60,6 +64,62 @@ class AuthService extends BaseService
         ]);
 
         return $this->getResponseData();
+    }
+
+    public function verifyPhoneAndSendOtp(Request $request)
+    {
+
+        $user = $this->userRep->verifyByPhone($request['phone']);
+        if (empty($user)) {
+            $msg = 'Số điện thoại không đúng. Vui lòng nhập lại.';
+            abort(Response::HTTP_BAD_REQUEST, $msg);
+        }
+        // Send otp
+
+        $otp = $this->otpRep->verifyByUser($user->id);
+        if (!empty($otp) && !$otp->is_verify) {
+            $dataUpdateOtp = [
+                'otp'     => DEFAULT_NUMBER_OTP,
+                'user_id' => $user->id,
+                'is_verify' => STATUS_INACTIVE
+            ];
+            $this->otpRep->update($dataUpdateOtp, $otp->id);
+        } else {
+            $dataCreateOtp = [
+                'otp'     => DEFAULT_NUMBER_OTP,
+                'user_id' => $user->id,
+                'is_verify' => STATUS_INACTIVE
+            ];
+            $this->otpRep->create($dataCreateOtp);
+        }
+
+        $this->setMessage("Số điện thoại có trong hệ thống");
+        $this->setData([
+            'user_id' => $user->id,
+        ]);
+
+        return $this->getResponseData();
+
+    }
+
+    public function verifyOtp(Request $request)
+    {
+
+        $otp = $this->otpRep->verifyByOtp($request->all());
+        if (!empty($otp)) {
+            $dataUpdateOtp = [
+                'is_verify' => STATUS_ACTIVE
+            ];
+            $this->otpRep->update($dataUpdateOtp, $otp->id);
+        } else {
+            $msg = 'Mã OTP sai. Vui lòng nhập lại.';
+            abort(Response::HTTP_BAD_REQUEST, $msg);
+        }
+
+        $this->setMessage("Xác thực OTP thành công");
+
+        return $this->getResponseData();
+
     }
 
     public function logout()
@@ -109,35 +169,31 @@ class AuthService extends BaseService
 
         // Create client
         $dataCreateClient = [
-            'name'        => $request['name_client'],
-            'phone'       => $request['phone_client'],
-            'location'    => $request['location_client'],
-            'city_id'     => $request['city_id'],
-            'district_id' => $request['district_id']
+            'name'  => $request['first_name'] . ' ' . $request['last_name'],
+            'phone' => $request['phone']
         ];
         $client           = $this->clientRep->create($dataCreateClient);
 
         // Create Brand
         $dataCreateBrand = [
-            'client_id'   => $client->id,
-            'name'        => $request['name_client'],
-            'phone'       => $request['phone_client'],
-            'location'    => $request['location_client'],
-            'city_id'     => $request['city_id'],
-            'district_id' => $request['district_id'],
-            'start_time'  => START_TIME,
-            'end_time'    => END_TIME
+            'client_id'  => $client->id,
+            'name'       => NAME_REGISTER,
+            'phone'      => $request['phone'],
+            'start_time' => START_TIME,
+            'end_time'   => END_TIME
         ];
         $brand           = $this->brandRep->create($dataCreateBrand);
 
         // Create user
         $dataCreateUser = [
-            'client_id' => $client->id,
-            'brand_id'  => $brand->id,
-            'name'      => $request['name'],
-            'email'     => $request['email'],
-            'phone'     => $request['phone'],
-            'password'  => app('hash')->make($request['password'])
+            'client_id'  => $client->id,
+            'brand_id'   => $brand->id,
+            'first_name' => $request['first_name'],
+            'last_name'  => $request['last_name'],
+            'name'       => $request['name'],
+            'email'      => $request['email'],
+            'phone'      => $request['phone'],
+            'password'   => app('hash')->make($request['password'])
         ];
         $user           = $this->userRep->create($dataCreateUser);
 
@@ -147,7 +203,7 @@ class AuthService extends BaseService
         ];
         $this->userRoleRep->create($dataCreateRole);
 
-        $this->setMessage("Tạo cửa hàng thành công");
+        $this->setMessage("Tạo tài khoản thành công");
 
         return $this->getResponseData();
 

@@ -9,12 +9,13 @@ class RegisterValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'name'            => 'required',
-            'name_client'     => 'required',
+            'first_name'      => 'required',
+            'last_name'       => 'required',
+            /*'name_client'     => 'required',
             'location_client' => 'required',
             'phone_client'    => 'required|numeric',
             'city_id'         => 'required|numeric',
-            'district_id'     => 'required|numeric',
+            'district_id'     => 'required|numeric',*/
             'phone'           => 'required|numeric|unique:user,phone',
             'password'        => 'required'
         ];
@@ -26,16 +27,17 @@ class RegisterValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required'            => 'Họ tên bắt buộc.',
-            'name_client.required'     => 'Tên cửa hàng bắt buộc.',
+            'first_name.required'            => 'Họ bắt buộc.',
+            'last_name.required'            => 'Tên bắt buộc.',
+            /*'name_client.required'     => 'Tên cửa hàng bắt buộc.',
             'location_client.required' => 'Địa chỉ cửa hàng bắt buộc.',
             'phone_client.required'    => 'Số điện thoại cửa hàng bắt buộc.',
             'city_id.required'         => 'Thành phố bắt buộc.',
             'city_id.numeric'          => 'Thành phố bắt buộc.',
             'district_id.required'     => 'Quận/Huyện bắt buộc.',
-            'district_id.numeric'      => 'Quận/Huyện bắt buộc.',
-            'phone.required'           => 'Số điện thoại đăng nhập bắt buộc.',
-            'phone.unique'             => 'Số điện thoại đăng nhập đã tồn tại.',
+            'district_id.numeric'      => 'Quận/Huyện bắt buộc.',*/
+            'phone.required'           => 'Số điện thoại đăng ký bắt buộc.',
+            'phone.unique'             => 'Số điện thoại đăng ký đã tồn tại.',
             'phone.numeric'            => 'Số điện thoại chưa đúng định dạng.',
             'password.required'        => 'Mật khẩu bắt buộc.'
         ];
