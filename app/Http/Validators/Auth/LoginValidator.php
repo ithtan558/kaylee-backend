@@ -10,7 +10,8 @@ class LoginValidator implements AbstractValidator
     {
         return [
             'account'  => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'token' => 'required'
         ];
     }
 
@@ -21,7 +22,8 @@ class LoginValidator implements AbstractValidator
     {
         return [
             'account.required'  => 'Số điện thoại bắt buộc',
-            'password.required' => 'Mật khẩu bắt buộc'
+            'password.required' => 'Mật khẩu bắt buộc',
+            'token.required' => 'Token bắt buộc'
         ];
     }
 }

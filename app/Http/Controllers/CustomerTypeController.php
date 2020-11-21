@@ -14,7 +14,7 @@ class CustomerTypeController extends Controller
 
     public function __construct(Request $request, CustomerTypeService $customerTypeService)
     {
-        $this->request      = $request;
+        $this->request             = $request;
         $this->customerTypeService = $customerTypeService;
     }
 

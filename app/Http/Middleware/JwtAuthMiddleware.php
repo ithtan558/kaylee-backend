@@ -10,17 +10,19 @@ namespace App\Middleware;
 
 use App\Libraries\Api;
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
+use Illuminate\Support\Facades\Log;
 
 class JwtAuthMiddleware extends BaseMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
+     * @param Request $request
+     * @param Closure $next
      * @param string|null $guard
      * @return mixed
      */
@@ -40,4 +42,5 @@ class JwtAuthMiddleware extends BaseMiddleware
 
         return $next($request);
     }
+
 }

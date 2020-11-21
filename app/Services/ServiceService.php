@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Helpers\CommonHelper;
 use App\Repositories\ServiceRepository;
 use App\Repositories\BrandServiceRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use stdClass;
 
 class ServiceService extends BaseService
 {
@@ -33,6 +35,11 @@ class ServiceService extends BaseService
     public function getList(Request $request)
     {
         $data = $this->serviceRep->getList($request->all());
+        foreach ($data['items'] as &$item) {
+            if (!empty($item->image)) {
+                $item->image = PATH_IMAGE . $item->image;
+            }
+        }
         $this->setData($data);
 
         return $this->getResponseData();
@@ -40,9 +47,27 @@ class ServiceService extends BaseService
 
     public function getDetail($id)
     {
-        $data            = $this->serviceRep->getDetail($id);
-        $brandServices   = $this->brandServiceRep->getByServiceId($id)->pluck('brand_id');
-        $data->brand_ids = $brandServices;
+        $data          = $this->serviceRep->getDetail($id);
+        $brandServices = $this->brandServiceRep->getByServiceId($id);
+        $brands        = [];
+        foreach ($brandServices as $brandService) {
+            $obj       = new stdClass();
+            $obj->id   = $brandService->brand_id;
+            $obj->name = $brandService->brand_name;
+            $brands[]  = $obj;
+        }
+        $data->brands = $brands;
+
+        // Category
+        $obj            = new stdClass();
+        $obj->id        = $data->category_id;
+        $obj->name      = $data->category_name;
+        $data->category = $obj;
+
+        unset($data->category_id);
+
+        $data->image = PATH_IMAGE . $data->image;
+
         $this->setData($data);
 
         return $this->getResponseData();
@@ -56,7 +81,7 @@ class ServiceService extends BaseService
                 'name'        => $request['name'],
                 'code'        => $request['code'],
                 'description' => $request['description'],
-                /*'category_id' => $request['category_id'],*/
+                'category_id' => $request['category_id'],
                 'time'        => $request['time'],
                 'price'       => $request['price'],
                 'is_active'   => STATUS_ACTIVE,
@@ -72,16 +97,20 @@ class ServiceService extends BaseService
             foreach ($arr_brand as $brand) {
                 $dataCreateBrandService = [
                     'brand_id'   => $brand,
-                    'service_id' => $service->id
+                    'service_id' => $service->id,
+                    'is_active'   => STATUS_ACTIVE,
                 ];
                 $this->brandServiceRep->create($dataCreateBrandService);
             }
-
-            $this->setMessage('Tạo dịch vụ thành công');
-            $this->setData($dataCreate);
-        } catch (\Exception $ex) {
-            $this->setMessage($ex->getMessage());
-            $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $msg          = new stdClass();
+            $msg->title   = 'Thành công';
+            $msg->content = 'Tạo dịch vụ thành công';
+            $this->setMessage($msg);
+        } catch (Exception $ex) {
+            $errors          = new stdClass();
+            $errors->title   = 'Tạo loại dịch vụ thất bại';
+            $errors->message = $ex->getMessage();
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         return $this->getResponseData();
     }
@@ -93,7 +122,7 @@ class ServiceService extends BaseService
                 'name'        => $request['name'],
                 'code'        => $request['code'],
                 'description' => $request['description'],
-                /*'category_id' => $request['category_id'],*/
+                'category_id' => $request['category_id'],
                 'time'        => $request['time'],
                 'price'       => $request['price'],
                 'is_active'   => STATUS_ACTIVE,
@@ -101,7 +130,9 @@ class ServiceService extends BaseService
             ];
 
             $name                = CommonHelper::uploadImage($request);
-            $dataUpdate['image'] = $name;
+            if ($name) {
+                $dataUpdate['image'] = $name;
+            }
 
             $this->serviceRep->update($dataUpdate, $request['id']);
 
@@ -118,19 +149,27 @@ class ServiceService extends BaseService
                 $this->brandServiceRep->create($dataCreateBrandService);
             }
 
-            $this->setMessage('Cập nhật dịch vụ thành công');
-            $this->setData($dataUpdate);
-        } catch (\Exception $ex) {
-            $this->setMessage($ex->getMessage());
-            $this->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $msg          = new stdClass();
+            $msg->title   = 'Thành công';
+            $msg->content = 'Cập nhật dịch vụ thành công';
+            $this->setMessage($msg);
+        } catch (Exception $ex) {
+            $errors          = new stdClass();
+            $errors->title   = 'Tạo loại dịch vụ thất bại';
+            $errors->message = $ex->getMessage();
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
         return $this->getResponseData();
     }
 
     public function delete($id)
     {
-        $this->serviceRep->destroy($id);
-        $this->setMessage('Xóa dịch vụ thành công');
+        $this->serviceRep->update(['is_delete' => 1], $id);
+        $this->brandServiceRep->updateByMultipleCondition(['is_delete' => 1], ['service_id' => $id]);
+        $msg          = new stdClass();
+        $msg->title   = 'Thành công';
+        $msg->content = 'Xóa dịch vụ thành công';
+        $this->setMessage($msg);
         $this->setStatusCode(Response::HTTP_OK);
 
         return $this->getResponseData();

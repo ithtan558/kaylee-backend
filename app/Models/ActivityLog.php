@@ -4,8 +4,6 @@ namespace App\Models;
 
 class ActivityLog extends BaseModel
 {
-    const CREATED_AT = 'created_date';
-    const UPDATED_AT = 'updated_date';
 
     protected $table = 'activity_log';
     protected $fillable

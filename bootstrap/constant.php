@@ -25,8 +25,13 @@ define('DIR_UPLOAD', '/upload/images/');
  | define order status MMAP
 ----------------------------------------------------------------------------
 */
-define('ORDER_STATUS_FINISHED', 1);
-define('ORDER_STATUS_ORDERED', 2);
+define('ORDER_STATUS_ORDERED', 1);
+define('ORDER_STATUS_WAITING', 2);
+define('ORDER_STATUS_FINISHED', 3);
+define('ORDER_STATUS_NOT_PAID', 4);
+define('ORDER_STATUS_CANCEL', 5);
+define('ORDER_STATUS_ACCEPTED', 6);
+define('ORDER_STATUS_REFUND', 7);
 
 /*
  | define payment method
@@ -69,4 +74,73 @@ define('NAME_REGISTER', 'Chi nhánh của bạn');
 */
 define('DEFAULT_NUMBER_OTP', '0000');
 
+/*
+ | define code for errors
+----------------------------------------------------------------------------
+*/
+define('ERRORS', [
+    'first_name'                            => 100001,
+    'last_name'                             => 100002,
+    'cart_customer.last_name'               => 100002,
+    'phone'                                 => 100003,
+    'password'                              => 100004,
+    'account'                               => 100005,
+    'otp'                                   => 100006,
+    'user_id'                               => 100007,
+    'name'                                  => 100008,
+    'cart_supplier_information.name'        => 100008,
+    'city_id'                               => 100009,
+    'cart_supplier_information.city_id'     => 100009,
+    'district_id'                           => 100010,
+    'cart_supplier_information.district_id' => 100010,
+    'start_time'                            => 100011,
+    'end_time'                              => 100012,
+    'image'                                 => 100013,
+    'role_id'                               => 100014,
+    'brand_id'                              => 100015,
+    'cart_items'                            => 100016,
+    'cart_employee'                         => 100017,
+    'code'                                  => 100018,
+    'brand_ids'                             => 100019,
+    'time'                                  => 100020,
+    'price'                                 => 100021,
+    'email'                                 => 100022,
+    'id'                                    => 100023,
+    'start_date'                            => 100024,
+    'end_date'                              => 100025,
+    'supplier_id'                           => 100026,
+    'cart_supplier_information.address'     => 100027,
+    'cart_supplier_information.wards_id'    => 100028,
+]);
 
+/*
+ | define path for image
+----------------------------------------------------------------------------
+*/
+define('URL_IMAGE_SUPPLIER', "http://cms.kaylee.vn");
+define('PATH_IMAGE_SUPPLIER', URL_IMAGE_SUPPLIER . '/upload/');
+
+//define('URL', "http://" . $_SERVER['SERVER_NAME']);
+//define('PATH_IMAGE', URL . '/upload/images/');
+
+/*
+ | define status for reservation
+----------------------------------------------------------------------------
+*/
+define('RESERVATION_BOOKED', 1);
+define('RESERVATION_CAME', 2);
+define('RESERVATION_ORDERED', 3);
+define('RESERVATION_CANCELED', 4);
+
+/*
+ | define status for notification
+----------------------------------------------------------------------------
+*/
+define('NOTIFICATION_NOT_READ', 1);
+define('NOTIFICATION_READ', 2);
+
+/*
+ | define prefix number phone for notification
+----------------------------------------------------------------------------
+*/
+define('NUMBER_PREFIXES', ['0812', '0813', '0814', '0815', '0816', '0817', '0818', '0819', '0909', '0908']);

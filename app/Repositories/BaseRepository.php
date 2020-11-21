@@ -14,7 +14,7 @@ use App\Helpers\CommonHelper;
 class BaseRepository
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Model Model
+     * @var Model Model
      */
     protected $model;
 
@@ -112,10 +112,16 @@ class BaseRepository
         return $this->model->where($attributes)->get();
     }
 
+    public function findByAUserId($user_id)
+    {
+        return $this->model->where('user_id', $user_id)->first();
+    }
+
     public function findByCode($code)
     {
         return $this->model->where('code', $code)->first();
     }
+
 
     public function findByMany(array $ids)
     {
@@ -157,7 +163,7 @@ class BaseRepository
         $totalRecord = $data->total();
         $result      = [
             'page'  => $data->currentPage(),
-            'limit' => $length,
+            'limit' => (int)$length,
             'total' => $totalRecord,
             'pages' => ceil($totalRecord / $length),
             'items' => $data->items(),
@@ -192,13 +198,16 @@ class BaseRepository
                         $val = '%' . $val . '%';
                     }
                     if (is_array($fieldSearch[$key]['field'])) {
+                        $where_raw = '';
                         foreach ($fieldSearch[$key]['field'] as $index => $item) {
                             if ($index == 0) {
-                                $query->where(DB::raw($item), $compare, $val);
+                                $where_raw .= "( ".DB::raw($item) . " " . $compare . " '" . $val . "'";
                             } else {
-                                $query->orWhere(DB::raw($item), $compare, $val);
+                                $where_raw .= "or ".DB::raw($item) . " " . $compare . " '" . $val . "'";
                             }
                         }
+                        $where_raw .= ")";
+                        $query->whereRaw($where_raw);
                     }
 
                     break;

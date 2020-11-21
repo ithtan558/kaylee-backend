@@ -10,12 +10,6 @@ class District extends BaseModel
         = [
             'city_id',
             'name',
-            'description',
-            'address',
-            'wards_id',
-            'district_id',
-            'city_id',
-            'image',
             'created_by',
             'updated_by'
         ];

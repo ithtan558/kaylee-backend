@@ -59,6 +59,7 @@ class EmployeeController extends Controller
 
     public function update()
     {
+
         $this->validate($this->request, EmployeeUpdateValidator::rules(), EmployeeUpdateValidator::messages());
 
         $data = $this->employeeService->update($this->request);

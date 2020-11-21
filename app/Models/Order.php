@@ -16,6 +16,7 @@ class Order extends BaseModel
             'employee_id',
             'code',
             'customer_id',
+            'supplier_id',
             'order_status_id',
             'is_paid',
             'name',
@@ -23,7 +24,11 @@ class Order extends BaseModel
             'email',
             'note',
             'amount',
-            'discount'
+            'discount',
+            'created_at',
+            'updated_at',
+            'created_by',
+            'updated_by'
         ];
 
     public function order_details()

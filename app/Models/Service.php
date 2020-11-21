@@ -16,6 +16,8 @@ class Service extends BaseModel
             'time',
             'price',
             'image',
+            'is_active',
+            'is_delete',
             'created_by',
             'updated_by'
         ];

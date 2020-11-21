@@ -14,7 +14,7 @@ class CityRepository extends BaseRepository
     public function getAll()
     {
         $result = $this->model
-            ->select('*')
+            ->select('id', 'name')
             ->where('is_active', STATUS_ACTIVE)
             ->orderBy('name', 'DESC')
             ->get();

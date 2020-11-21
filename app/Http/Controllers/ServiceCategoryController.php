@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Validators\ServiceCategory\ProductCategoryCreateValidator;
+use App\Http\Validators\ServiceCategory\ProductCategoryUpdateValidator;
 use App\Http\Validators\ServiceCategory\ServiceCategoryCreateValidator;
 use App\Http\Validators\ServiceCategory\ServiceCategoryUpdateValidator;
 use Illuminate\Http\Request;

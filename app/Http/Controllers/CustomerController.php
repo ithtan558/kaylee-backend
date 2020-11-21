@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Validators\Customer\CustomerCreateValidator;
 use App\Http\Validators\Customer\CustomerUpdateValidator;
+use App\Http\Validators\Customer\ReservationCreateValidator;
+use App\Http\Validators\Customer\ReservationUpdateValidator;
 use Illuminate\Http\Request;
 use App\Services\CustomerService;
 use App\Libraries\Api;

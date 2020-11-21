@@ -9,7 +9,7 @@ class ServiceCategoryCreateValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'name'        => 'required'
+            'name' => 'required'
         ];
     }
 
@@ -19,7 +19,7 @@ class ServiceCategoryCreateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required'       => 'Tên bắt buộc.'
+            'name.required' => 'Tên bắt buộc.'
         ];
     }
 }

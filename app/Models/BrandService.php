@@ -9,7 +9,9 @@ class BrandService extends BaseModel
     protected $fillable
         = [
             'brand_id',
-            'service_id'
+            'service_id',
+            'is_active',
+            'is_delete'
         ];
 
 }

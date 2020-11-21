@@ -15,4 +15,8 @@ class UserRole extends BaseModel
             'updated_by'
         ];
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
 }

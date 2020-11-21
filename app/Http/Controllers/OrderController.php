@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Validators\Order\OrderCreateValidator;
+use App\Http\Validators\Order\OrderUpdateStatusValidator;
+use App\Http\Validators\Order\OrderUpdateValidator;
 use App\Http\Validators\Order\ReportTotalValidator;
+use App\Http\Validators\Order\SupplierOrderCreateValidator;
+use App\Http\Validators\Order\SupplierOrderUpdateValidator;
 use Illuminate\Http\Request;
 use App\Services\OrderService;
 use App\Libraries\Api;
@@ -56,4 +60,35 @@ class OrderController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
+    public function update()
+    {
+        $this->validate($this->request, OrderUpdateValidator::rules(), OrderUpdateValidator::messages());
+        $data = $this->orderService->update($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function createSupplier()
+    {
+        $this->validate($this->request, SupplierOrderCreateValidator::rules(), SupplierOrderCreateValidator::messages());
+        $data = $this->orderService->createSupplier($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function updateSupplier()
+    {
+        $this->validate($this->request, SupplierOrderUpdateValidator::rules(), SupplierOrderUpdateValidator::messages());
+        $data = $this->orderService->updateSupplier($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function updateStatus()
+    {
+        $this->validate($this->request, OrderUpdateStatusValidator::rules(), OrderUpdateStatusValidator::messages());
+        $data = $this->orderService->updateStatus($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
 }

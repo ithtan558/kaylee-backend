@@ -16,7 +16,7 @@ class CustomerTypeRepository extends BaseRepository
     {
 
         $query = $this->model
-            ->select('*')
+            ->select(["id", "code", "name"])
             ->where('is_active', STATUS_ACTIVE);
 
         $result = $query->orderBy('id', 'DESC')->get();

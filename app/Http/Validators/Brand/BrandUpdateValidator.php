@@ -25,6 +25,7 @@ class BrandUpdateValidator implements AbstractValidator
     public static function messages()
     {
         return [
+            'id.exists'            => 'Id không tồn tại trong hệ thống.',
             'name.required'        => 'Tên bắt buộc.',
             'phone.required'       => 'Số điện thoại bắt buộc.',
             'city_id.required'     => 'Thành phố bắt buộc.',

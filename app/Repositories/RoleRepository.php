@@ -15,8 +15,8 @@ class RoleRepository extends BaseRepository
     public function getAll()
     {
         // Filter base on roles of user
-        $user = CommonHelper::getAuth();
-        $roles = [];
+        $user         = CommonHelper::getAuth();
+        $roles        = [];
         $reject_roles = [];
         foreach ($user->user_roles as $role) {
             $roles[] = $role->role_id;
@@ -30,7 +30,7 @@ class RoleRepository extends BaseRepository
         }
 
         $result = $this->model
-            ->select('*')
+            ->select(['id', 'name', 'code', 'description'])
             ->where('is_active', STATUS_ACTIVE)
             ->whereNotIn('id', $reject_roles)
             ->get();

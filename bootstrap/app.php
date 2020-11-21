@@ -45,7 +45,8 @@ $app->singleton(
 
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
+    App\Console\Kernel::class,
+    App\Http\Middleware\LogAfterRequest::class
 );
 
 /*
@@ -60,7 +61,8 @@ $app->singleton(
 */
 
  $app->middleware([
-    App\Http\Middleware\CorsMiddleware::class
+     App\Http\Middleware\CorsMiddleware::class,
+     App\Http\Middleware\LogAfterRequest::class
  ]);
 
 $app->routeMiddleware([
@@ -88,12 +90,15 @@ $app->alias('JWTAuth', \Tymon\JWTAuth\Facades\JWTAuth::class);
 $app->alias('JWTFactory', Tymon\JWTAuth\Facades\JWTFactory::class);
 $app->alias('config', \Illuminate\Support\Facades\Config::class);
 $app->alias('JWTAuth', \Intervention\Image\ImageServiceProvider::class);
+$app->alias('FCM', \LaravelFCM\Facades\FCM::class);
+$app->alias('FCMGroup', \LaravelFCM\Facades\FCMGroup::class);
 
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 $app->register(App\Providers\HelperServiceProvider::class);
 $app->register(\Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(LaravelFCM\FCMServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

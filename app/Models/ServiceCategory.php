@@ -11,6 +11,8 @@ class ServiceCategory extends BaseModel
             'client_id',
             'name',
             'description',
+            'sequence',
+            'code',
             'is_active',
             'is_delete',
             'created_by',

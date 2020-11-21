@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -35,7 +36,7 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param \Exception $e
+     * @param Exception $e
      * @return void
      */
     public function report(Exception $e)
@@ -46,22 +47,28 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Exception $e
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Exception $e
+     * @return Response
      */
     public function render($request, Exception $e)
     {
+
         // Customize response when exception is instance of ValidationException
         if ($e instanceof ValidationException && $e->getResponse()) {
             $errors = json_decode($e->getResponse()->getContent(), true);
             $errors = CommonHelper::formatErrorsMessage($errors);
 
-            return Api::response(['message' => $errors], Response::HTTP_BAD_REQUEST);
+            return Api::response([
+                'message' => 'Lỗi!',
+                'data'    => [
+                    'errors' => $errors
+                ]
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         if ($e instanceof NotFoundHttpException) {
-            return Api::response(['message' => 'Page not found'], Response::HTTP_NOT_FOUND);
+            return Api::response(['message' => 'Trang không tìm thấy'], Response::HTTP_NOT_FOUND);
         }
 
         if ($e instanceof HttpException) {
@@ -75,6 +82,7 @@ class Handler extends ExceptionHandler
         if ($e instanceof ErrorException) {
             return Api::response(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
 
         return parent::render($request, $e);
     }

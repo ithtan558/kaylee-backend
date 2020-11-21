@@ -10,9 +10,9 @@ class RoleService extends BaseService
 {
     protected $roleRep;
 
-    public function __construct(RoleRepository $cityRep)
+    public function __construct(RoleRepository $roleRep)
     {
-        $this->roleRep = $cityRep;
+        $this->roleRep = $roleRep;
     }
 
     public function getAll()

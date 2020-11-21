@@ -19,6 +19,7 @@ class Brand extends BaseModel
             'image',
             'start_time',
             'end_time',
+            'is_delete',
             'created_by',
             'updated_by'
         ];

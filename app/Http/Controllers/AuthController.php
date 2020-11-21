@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Validators\Auth\RegisterValidator;
+use App\Http\Validators\Auth\UpdatePasswordValidator;
+use App\Http\Validators\Auth\UpdateValidator;
 use App\Http\Validators\Auth\VerifyOtpValidator;
 use App\Http\Validators\Auth\VerifyPhoneAndSendOtpValidator;
 use Illuminate\Http\Request;
@@ -52,6 +54,22 @@ class AuthController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
+    public function verifyOtpForRegister()
+    {
+        $this->validate($this->request, VerifyOtpValidator::rules(), VerifyOtpValidator::messages());
+        $data = $this->authService->verifyOtp($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function updatePassword()
+    {
+        $this->validate($this->request, UpdatePasswordValidator::rules(), UpdatePasswordValidator::messages());
+        $data = $this->authService->updatePassword($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
     public function getUserInfo()
     {
         $data = $this->authService->getAuthenticatedUser();
@@ -59,11 +77,17 @@ class AuthController extends Controller
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 
-
     public function register()
     {
         $this->validate($this->request, RegisterValidator::rules(), RegisterValidator::messages());
         $data = $this->authService->create($this->request);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+    }
+
+    public function update()
+    {
+        $this->validate($this->request, UpdateValidator::rules(), UpdateValidator::messages());
+        $data = $this->authService->update($this->request);
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 }

@@ -34,25 +34,26 @@ class ServiceCategoryRepository extends BaseRepository
         }
 
         $query = $this->model
-            ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->select('id', 'code', 'name', 'description', 'sequence', 'image')
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
-        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles)){
+        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles)) {
             $query = $query->where('client_id', $user->client_id);
         }
 
-        $result = $query->orderBy('id', 'DESC')->get();
+        $result = $query->orderBy('sequence', 'ASC')->get();
 
         return $result;
     }
 
     public function getList($params)
     {
-        $order  = 'id';
+        $order  = 'sequence';
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select(ServiceCategory::getCol('*'));
+        $query = $this->model->select('id', 'code', 'name', 'description', 'sequence', 'image');
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
@@ -66,7 +67,9 @@ class ServiceCategoryRepository extends BaseRepository
             $query = $query->where('client_id', $user->client_id);
         }
 
-        $query = $query->orderBy($order, $sort)
+        $query = $query->where('is_active', STATUS_ACTIVE);
+        $query = $query->where('is_delete', STATUS_INACTIVE);
+        $query = $query->orderBy($order, 'ASC')
             ->paginate($length);
 
         return $this->formatPagination($query);
@@ -75,7 +78,7 @@ class ServiceCategoryRepository extends BaseRepository
     public function getDetail($id)
     {
         $query = $this->model
-            ->select("id", "name", "description", "image")
+            ->select("id", "name", "description", "code","sequence", "image")
             ->where('id', $id)
             ->first();
 

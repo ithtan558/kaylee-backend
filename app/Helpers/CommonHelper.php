@@ -2,8 +2,13 @@
 
 namespace App\Helpers;
 
+use App\Model\Config;
+use App\Models\Order;
+use Exception;
+use stdClass;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Str;
 
 class CommonHelper
 {
@@ -15,19 +20,26 @@ class CommonHelper
      */
     public static function formatErrorsMessage($errors = [])
     {
-        $errMgs = [];
+        $errors_tmp = ERRORS;
+        $errMgs     = [];
 
         foreach ($errors as $key => $error) {
-            $errMgs = array_merge($errMgs, $error);
+            $obj = new stdClass();
+            foreach ($errors_tmp as $key_tmp => $error_tmp) {
+                if ($key == $key_tmp) {
+                    $obj->code    = $error_tmp;
+                    $obj->message = $error[0];
+                    break;
+                }
+            }
+            $errMgs[] = $obj;
         }
-
-        $errMgs = array_values(array_unique($errMgs));
 
         if (!$errMgs) {
             return null;
         }
 
-        return implode('<br>', $errMgs);
+        return $errMgs;
     }
 
     public static function renameUnique($path, $filename)
@@ -52,7 +64,7 @@ class CommonHelper
     {
         try {
             unlink($pathFile);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             return false;
         }
 
@@ -64,7 +76,7 @@ class CommonHelper
         try {
             $user = JWTAuth::user();
             return $key != '' ? (empty($user->{$key}) ? null : $user->{$key}) : $user;
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             return null;
         }
     }
@@ -93,24 +105,42 @@ class CommonHelper
     {
         $filename = '';
         if ($request->hasFile('image')) {
-            $image           = $request->file('image');
-            $filename = $image->getClientOriginalName();
+            $image        = $request->file('image');
+            $ext          = '.' . $request->image->getClientOriginalExtension();
+            $filename     = Str::slug(str_replace($ext, microtime(), $request->image->getClientOriginalName())).$ext;
             $image_resize = Image::make($image->getRealPath());
-            $image_resize->resize(400, 400);
-            $image_resize->save(public_path(DIR_UPLOAD .$filename));
+            $image_resize->orientate();
+            //$image_resize->resize(100, 100);
+            $image_resize->save(public_path(DIR_UPLOAD . $filename));
         }
         return $filename;
     }
 
-    public static function createRandomPassword($id)
+    public static function createRandomCode($length = 10)
     {
 
-        $suffix = "000000" . $id;
-        if (strlen($suffix) >= 7) {
-            $suffix = substr($suffix, strlen($suffix) - 6, 6);
-        }
 
-        return $suffix;
+        $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        do {
+            for ($i = 0; $i <= 10; $i++) {
+                $randomString .= $characters[rand(0, $charactersLength - 1)];
+            }
+            $order = Order::where("code", 1)->get()->pluck("value", "key");
+            if (count($order) == 0)
+                break;
+        } while(true);
 
+        return $randomString;
     }
+
+    public static function randomNumberSequence($requiredLength = 7, $highestDigit = 8) {
+        $sequence = '';
+        for ($i = 0; $i < $requiredLength; ++$i) {
+            $sequence .= mt_rand(0, $highestDigit);
+        }
+        return $sequence;
+    }
+
 }

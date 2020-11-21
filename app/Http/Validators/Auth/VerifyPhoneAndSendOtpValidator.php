@@ -9,7 +9,7 @@ class VerifyPhoneAndSendOtpValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'phone'  => 'required'
+            'phone' => 'required'
         ];
     }
 
@@ -19,7 +19,7 @@ class VerifyPhoneAndSendOtpValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'phone.required'  => 'Số điện thoại bắt buộc'
+            'phone.required' => 'Số điện thoại bắt buộc'
         ];
     }
 }

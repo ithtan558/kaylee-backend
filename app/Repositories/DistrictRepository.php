@@ -14,9 +14,8 @@ class DistrictRepository extends BaseRepository
     public function getAll()
     {
         $result = $this->model
-            ->select('*')
+            ->select('id', 'name', 'city_id')
             ->where('is_active', STATUS_ACTIVE)
-            ->orderBy('sequence', 'ASC')
             ->get();
 
         return $result;
@@ -25,10 +24,9 @@ class DistrictRepository extends BaseRepository
     public function getListByCity($city_id)
     {
         $result = $this->model
-            ->select('*')
+            ->select('id', 'name','city_id')
             ->where('is_active', STATUS_ACTIVE)
             ->where('city_id', $city_id)
-            ->orderBy('sequence', 'ASC')
             ->get();
 
         return $result;

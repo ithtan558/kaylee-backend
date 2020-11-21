@@ -23,7 +23,6 @@ class BrandController extends Controller
     public function getAll()
     {
         $data = $this->brandService->getAll();
-
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }
 

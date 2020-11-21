@@ -11,13 +11,17 @@ class OrderDetail extends BaseModel
 
     protected $fillable
         = [
+            'client_id',
             'order_id',
             'service_id',
+            'product_id',
             'name',
             'price',
             'quantity',
             'total',
-            'note'
+            'note',
+            'is_active',
+            'is_delete'
         ];
 
 }

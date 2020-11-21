@@ -3,9 +3,13 @@
 namespace App\Repositories;
 
 use App\Helpers\CommonHelper;
+use App\Models\Brand;
 use App\Models\Customer;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 class UserRepository extends BaseRepository
 {
@@ -19,7 +23,7 @@ class UserRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [User::getCol('name'), User::getCol('phone')],
+                'field'   => [User::getCol('first_name'), User::getCol('last_name'), User::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -43,7 +47,8 @@ class UserRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select("*");
+        $query = $this->model->select("id", "first_name", "last_name", "image");
+        $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
         $user  = CommonHelper::getAuth();
@@ -51,12 +56,27 @@ class UserRepository extends BaseRepository
         foreach ($user->user_roles as $role) {
             $roles[] = $role->role_id;
         }
-
         if (in_array(ROLE_MANAGER, $roles)) {
             $query = $query->where('client_id', $user->client_id);
         } else if (in_array(ROLE_BRAND_MANAGER, $roles)) {
             $query = $query->where('brand_id', $user->brand_id);
         }
+
+        if (!empty($params['brand_id'])) {
+            $query = $query->where('brand_id', $params['brand_id']);
+        }
+        if (!empty($params['district_ids'])) {
+
+            $arr = explode(',', $params['district_ids']);
+            $query = $query->whereIn('district_id', $arr);
+        }
+        if (!empty($params['type_id'])) {
+            $query = $query->where('type_id', $params['type_id']);
+        }
+
+        $query = $query->where('is_active', STATUS_ACTIVE);
+        $query = $query->where('is_delete', STATUS_INACTIVE);
+
         $query = $query->orderBy($order, $sort)
             ->paginate($length);
 
@@ -66,11 +86,32 @@ class UserRepository extends BaseRepository
     public function getDetail($id)
     {
         $query = $this->model
-            ->where('id', $id)
+            ->select(
+                User::getCol('id'),
+                User::getCol('first_name'),
+                User::getCol('last_name'),
+                User::getCol('birthday'),
+                User::getCol('address'),
+                User::getCol('hometown_city_id'),
+                User::getCol('city_id'),
+                User::getCol('district_id'),
+                User::getCol('wards_id'),
+                User::getCol('phone'),
+                User::getCol('email'),
+                User::getCol('brand_id'),
+                Brand::getCol('name as brand_name'),
+                User::getCol('image')
+            )
+            ->join(Brand::getTbl(), Brand::getCol("id"), "=", User::getCol("brand_id"))
+            ->where(User::getCol("id"), $id)
             ->with(['user_roles'])
             ->first();
 
-        $query->role_id = $query->user_roles[0]->role_id;
+        $user_role   = $query->user_roles[0];
+        $obj         = new stdClass();
+        $obj->id     = $user_role->role->id;
+        $obj->name   = $user_role->role->name;
+        $query->role = $obj;
         unset($query->user_roles);
 
         return $query;
@@ -102,8 +143,12 @@ class UserRepository extends BaseRepository
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('brand_id', $user->brand_id);
-        } else if (in_array(ROLE_MANAGER, $roles)){
+        } else if (in_array(ROLE_MANAGER, $roles)) {
             $query = $query->where('client_id', $user->client_id);
+        }
+
+        if (isset($params['brand_id'])) {
+            $query = $query->where('brand_id', $params['brand_id']);
         }
 
         $result = $query->orderBy($order, $sort)->get();

@@ -11,9 +11,10 @@ class EmployeeUpdateValidator implements AbstractValidator
         $request = app('request');
         $id      = $request['id'];
         return [
-            'name'            => 'required',
-            'phone'           => 'required|numeric|unique:user,phone,' . $id,
-            'password'        => 'required'
+            'id'         => 'exists:user,id',
+            'first_name' => 'required',
+            'last_name'  => 'required',
+            'phone'      => 'required|numeric|unique:user,phone,' . $id
         ];
     }
 
@@ -23,11 +24,12 @@ class EmployeeUpdateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required'            => 'Họ tên bắt buộc.',
-            'phone.required'           => 'Số điện thoại bắt buộc.',
-            'phone.unique'             => 'Số điện thoại đã tồn tại.',
-            'phone.numeric'            => 'Số điện thoại chưa đúng định dạng.',
-            'password.required'        => 'Mật khẩu bắt buộc.'
+            'id.exists'           => 'Id không tồn tại trong hệ thống.',
+            'first_name.required' => 'Họ bắt buộc.',
+            'last_name.required'  => 'Tên bắt buộc.',
+            'phone.required'      => 'Số điện thoại bắt buộc.',
+            'phone.unique'        => 'Số điện thoại đã tồn tại.',
+            'phone.numeric'       => 'Số điện thoại chưa đúng định dạng.'
         ];
     }
 }

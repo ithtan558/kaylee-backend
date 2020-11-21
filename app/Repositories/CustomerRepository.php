@@ -16,7 +16,7 @@ class CustomerRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [Customer::getCol('name'), Customer::getCol('phone')],
+                'field'   => [Customer::getCol('first_name'), Customer::getCol('last_name'), Customer::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -51,7 +51,7 @@ class CustomerRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select(Customer::getCol('*'));
+        $query = $this->model->select(["id", "first_name", "last_name", "phone", "image"]);
         // Filter base on roles of user
         $user  = CommonHelper::getAuth();
         $roles = [];
@@ -59,9 +59,25 @@ class CustomerRepository extends BaseRepository
             $roles[] = $role->role_id;
         }
         if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+
             $query = $query->where('client_id', $user->client_id);
         }
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
+
+        if (!empty($params['city_id'])) {
+            $query = $query->where('city_id', $params['city_id']);
+        }
+        if (!empty($params['district_ids'])) {
+
+            $arr = explode(',', $params['district_ids']);
+            $query = $query->whereIn('district_id', $arr);
+        }
+        if (!empty($params['type_id'])) {
+            $query = $query->where('type_id', $params['type_id']);
+        }
+
+        $query = $query->where('is_active', STATUS_ACTIVE);
+        $query = $query->where('is_delete', STATUS_INACTIVE);
 
         $query = $query->orderBy($order, $sort)
             ->paginate($length);
@@ -74,7 +90,7 @@ class CustomerRepository extends BaseRepository
         $order = 'id';
         $sort  = $this->getOrder($params);
 
-        $query = $this->model->select(Customer::getCol('*'));
+        $query = $this->model->select(["id", "first_name", "last_name", "phone"]);
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
@@ -96,7 +112,21 @@ class CustomerRepository extends BaseRepository
     public function getDetail($id)
     {
         $query = $this->model
-            ->select("id", "type_id", "name", "phone", "email", "birthday", "image")
+            ->select(
+                "id",
+                "name",
+                "phone",
+                "image",
+                "first_name",
+                "last_name",
+                "hometown_city_id",
+                "address",
+                "city_id",
+                "district_id",
+                "wards_id",
+                "birthday",
+                "email"
+            )
             ->where('id', $id)
             ->first();
 
@@ -118,7 +148,7 @@ class CustomerRepository extends BaseRepository
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             //$query = $query->where('brand_id', $user->brand_id);
-        } else if (in_array(ROLE_MANAGER, $roles)){
+        } else if (in_array(ROLE_MANAGER, $roles)) {
             $query = $query->where('client_id', $user->client_id);
         }
 

@@ -9,9 +9,9 @@ class CustomerCreateValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'name'  => 'required',
-            'phone' => 'required|unique:customer,phone',
-            /*'email' => 'unique:customer,email'*/
+            'first_name' => 'required',
+            'last_name'  => 'required',
+            'phone'      => 'numeric|unique:customer,phone'
         ];
     }
 
@@ -21,10 +21,11 @@ class CustomerCreateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'name.required'  => 'Tên bắt buộc.',
-            'phone.required' => 'Số điện thoại bắt buộc.',
-            'phone.unique'   => 'Số điện thoại này đã có người sử dụng.',
-            /*'email.unique'   => 'Email này đã có người sử dụng.'*/
+            'first_name.required' => 'Họ bắt buộc.',
+            'last_name.required'  => 'Tên bắt buộc.',
+            //'phone.required'      => 'Số điện thoại bắt buộc.',
+            'phone.unique'        => 'Số điện thoại đã tồn tại.',
+            'phone.numeric'       => 'Số điện thoại chưa đúng định dạng.'
         ];
     }
 }

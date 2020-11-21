@@ -9,8 +9,8 @@ class VerifyOtpValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'otp'  => 'required',
-            'user_id'  => 'required'
+            'otp'     => 'required',
+            'user_id' => 'required'
         ];
     }
 
@@ -20,8 +20,8 @@ class VerifyOtpValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'otp.required'  => 'Otp bắt buộc',
-            'user_id.required'  => 'Tài khoản bắt buộc'
+            'otp.required'     => 'Otp bắt buộc',
+            'user_id.required' => 'Tài khoản bắt buộc'
         ];
     }
 }
