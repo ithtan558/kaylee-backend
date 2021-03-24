@@ -19,6 +19,7 @@ class VersionRepository extends BaseRepository
         $query = $this->model
             ->select(["name", "code", "description", "force"])
             ->where("is_active", STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->first();
         return $query;
     }

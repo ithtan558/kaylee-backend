@@ -11,9 +11,8 @@ class RegisterValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'first_name' => 'required',
-            'last_name'  => 'required',
-            'phone'      => ['required', 'numeric', Rule::unique('user')->where('company_id', $this->phone)],
+            'name' => 'required',
+            'phone'      => ['required', 'numeric', Rule::unique('user', 'phone')->where('is_active', 1)],
             'password'   => 'required',
             'email'      => 'email'
         ];
@@ -25,8 +24,7 @@ class RegisterValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'first_name.required' => 'Tên bắt buộc.',
-            'last_name.required'  => 'Họ bắt buộc.',
+            'name.required'  => 'Họ tên bắt buộc.',
             'phone.required'      => 'Số điện thoại đăng ký bắt buộc.',
             'phone.unique'        => 'Số điện thoại đăng ký đã tồn tại.',
             'phone.numeric'       => 'Số điện thoại chưa đúng định dạng.',

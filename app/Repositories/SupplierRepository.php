@@ -16,7 +16,7 @@ class SupplierRepository extends BaseRepository
 
     public function getList($params)
     {
-        $order  = 'id';
+        $order  = 'sequence';
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
@@ -29,7 +29,8 @@ class SupplierRepository extends BaseRepository
             $roles[] = $role->role_id;
         }
 
-        $query = $query->where('is_active', STATUS_ACTIVE);
+        $query->where('is_active', STATUS_ACTIVE);
+        $query->where('is_delete', STATUS_INACTIVE);
 
         $query = $query->orderBy($order, $sort)
             ->paginate($length);

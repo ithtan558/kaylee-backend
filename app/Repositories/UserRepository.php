@@ -23,7 +23,7 @@ class UserRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [User::getCol('first_name'), User::getCol('last_name'), User::getCol('phone')],
+                'field'   => [User::getCol('name'), User::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -34,6 +34,7 @@ class UserRepository extends BaseRepository
     {
         $result = $this->model
             ->select('*')
+            ->where('is_delete', STATUS_INACTIVE)
             ->where('is_active', STATUS_ACTIVE)
             ->orderBy('id', 'DESC')
             ->get();
@@ -47,7 +48,7 @@ class UserRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select("id", "first_name", "last_name", "image");
+        $query = $this->model->select("id", "name", "image");
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
@@ -88,8 +89,7 @@ class UserRepository extends BaseRepository
         $query = $this->model
             ->select(
                 User::getCol('id'),
-                User::getCol('first_name'),
-                User::getCol('last_name'),
+                User::getCol('name'),
                 User::getCol('birthday'),
                 User::getCol('address'),
                 User::getCol('hometown_city_id'),
@@ -104,6 +104,7 @@ class UserRepository extends BaseRepository
             )
             ->join(Brand::getTbl(), Brand::getCol("id"), "=", User::getCol("brand_id"))
             ->where(User::getCol("id"), $id)
+            ->where(User::getCol("is_delete"), STATUS_INACTIVE)
             ->with(['user_roles'])
             ->first();
 
@@ -121,6 +122,7 @@ class UserRepository extends BaseRepository
     {
         $query = $this->model
             ->where('phone', $phone)
+            ->where('is_delete', STATUS_INACTIVE)
             ->first();
 
         return $query;
@@ -131,7 +133,13 @@ class UserRepository extends BaseRepository
         $order = 'id';
         $sort  = $this->getOrder($params);
 
-        $query = $this->model->select(User::getCol('*'));
+        $query = $this->model->select([
+            User::getCol('id'),
+            User::getCol('brand_id'),
+            User::getCol('name'),
+            User::getCol('phone'),
+            User::getCol('image')
+        ]);
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
@@ -151,6 +159,9 @@ class UserRepository extends BaseRepository
             $query = $query->where('brand_id', $params['brand_id']);
         }
 
+        $query->where('is_delete', STATUS_INACTIVE);
+        $query->where('is_delete', STATUS_INACTIVE);
+        $query->with('user_roles');
         $result = $query->orderBy($order, $sort)->get();
 
         return $result;

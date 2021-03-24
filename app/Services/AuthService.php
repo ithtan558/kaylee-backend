@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\CommonHelper;
+use App\Libraries\Curl;
 use App\Repositories\UserRepository;
 use App\Repositories\UserRoleRepository;
 use App\Repositories\ClientRepository;
@@ -12,6 +13,7 @@ use App\Repositories\CityRepository;
 use App\Repositories\DistrictRepository;
 use App\Repositories\WardsRepository;
 use App\Repositories\UserDeviceRepository;
+use App\Repositories\AdminUsersRepository;
 use Illuminate\Http\Response;
 use stdClass;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -31,6 +33,7 @@ class AuthService extends BaseService
     protected $districtRep;
     protected $wardsRep;
     protected $userDeviceRep;
+    protected $adminUsersRep;
 
     public function __construct(
         UserRepository $userRep,
@@ -41,7 +44,8 @@ class AuthService extends BaseService
         CityRepository $cityRep,
         DistrictRepository $districtRep,
         WardsRepository $wardsRep,
-        UserDeviceRepository $userDeviceRep
+        UserDeviceRepository $userDeviceRep,
+        AdminUsersRepository $adminUsersRep
     )
     {
         $this->userRep       = $userRep;
@@ -53,14 +57,16 @@ class AuthService extends BaseService
         $this->districtRep   = $districtRep;
         $this->wardsRep      = $wardsRep;
         $this->userDeviceRep = $userDeviceRep;
+        $this->adminUsersRep = $adminUsersRep;
     }
 
     public function login(Request $request)
     {
         $field       = filter_var($request->all(), FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         $credentials = [
-            $field     => $request['account'],
-            'password' => $request['password']
+            $field      => $request['account'],
+            'password'  => $request['password'],
+            'is_active' => STATUS_ACTIVE
         ];
 
         if (!$token = JWTAuth::attempt($credentials, ['exp' => 1])) {
@@ -88,7 +94,7 @@ class AuthService extends BaseService
         $role = $this->userRoleRep->getRoleByUserId($auth->id)->pluck('code');
 
         // Insert device
-        $query_device = $this->userDeviceRep->findByAttributes(['token' => $request['token']]);
+        $query_device = $this->userDeviceRep->findByAttributes(['token' => $request['token'], 'user_id' => $auth->id]);
         if (count($query_device) == 0) {
             $insertUserDevice = [
                 'client_id' => $auth->client_id,
@@ -137,19 +143,18 @@ class AuthService extends BaseService
         $otp = $this->otpRep->verifyByUser($user->id);
         if (!empty($otp) && !$otp->is_verify) {
             $dataUpdateOtp = [
-                'otp'       => DEFAULT_NUMBER_OTP,
-                'user_id'   => $user->id,
-                'is_verify' => STATUS_INACTIVE
+                'is_delete' => STATUS_ACTIVE
             ];
             $this->otpRep->update($dataUpdateOtp, $otp->id);
-        } else {
-            $dataCreateOtp = [
-                'otp'       => DEFAULT_NUMBER_OTP,
-                'user_id'   => $user->id,
-                'is_verify' => STATUS_INACTIVE
-            ];
-            $this->otpRep->create($dataCreateOtp);
         }
+        $dataCreateOtp = [
+            'otp'       => DEFAULT_NUMBER_OTP,
+            'type'      => TYPE_OTP_FORGOT,
+            'user_id'   => $user->id,
+            'is_verify' => STATUS_INACTIVE
+        ];
+        $this->otpRep->create($dataCreateOtp);
+
         $msg          = new stdClass();
         $msg->title   = 'Thành công';
         $msg->content = 'Hệ thống đã gửi mã xác thực qua số điện thoại, xin vui lòng nhập ở bước tiếp theo';
@@ -165,13 +170,13 @@ class AuthService extends BaseService
     public function verifyOtp(Request $request)
     {
 
-        $otp                  = $this->otpRep->verifyByOtp($request->all());
+        $otp                  = $this->otpRep->verifyByOtp($request->all(), TYPE_OTP_FORGOT);
         $token_reset_password = md5(uniqid(rand(), true));
         if (!empty($otp)) {
             $dataUpdateOtp = [
                 'is_verify' => STATUS_ACTIVE
             ];
-            $this->otpRep->update($dataUpdateOtp, $otp->user_id);
+            $this->otpRep->update($dataUpdateOtp, $otp->id);
             // Update token reset password for user
             $dataUpdateUser = [
                 'token_reset_password' => $token_reset_password
@@ -198,12 +203,18 @@ class AuthService extends BaseService
     public function verifyOtpForRegister(Request $request)
     {
 
-        $otp                  = $this->otpRep->verifyByOtp($request->all());
+        $otp = $this->otpRep->verifyByOtp($request->all(), TYPE_OTP_REGISTER);
         if (!empty($otp)) {
             $dataUpdateOtp = [
                 'is_verify' => STATUS_ACTIVE
             ];
-            $this->otpRep->update($dataUpdateOtp, $otp->user_id);
+            $this->otpRep->update($dataUpdateOtp, $otp->id);
+            $user = $this->userRep->find($otp->user_id);
+            // Update data for user
+            $this->clientRep->updateByMultipleCondition(['is_active' => STATUS_ACTIVE], ['id' => $user->client_id]);
+            $this->brandRep->updateByMultipleCondition(['is_active' => STATUS_ACTIVE], ['id' => $user->brand_id]);
+            $this->userRep->updateByMultipleCondition(['is_active' => STATUS_ACTIVE], ['id' => $user->id]);
+            $this->userRoleRep->updateByMultipleCondition(['is_active' => STATUS_ACTIVE], ['user_id' => $user->id]);
         } else {
             $errors          = new stdClass();
             $errors->title   = 'Chứng thực thất bại';
@@ -294,6 +305,9 @@ class AuthService extends BaseService
         $this->setCityDistrictWards($user);
 
         unset($user->client_id);
+        unset($user->first_name);
+        unset($user->last_name);
+        unset($user->client_id);
         unset($user->token_reset_password);
         unset($user->city_id);
         unset($user->hometown_city_id);
@@ -319,13 +333,18 @@ class AuthService extends BaseService
 
         // Create client
         $dataCreateClient = [
-            'first_name' => $request['first_name'],
-            'last_name'  => $request['last_name'],
-            'name'       => $request['first_name'] . ' ' . $request['last_name'],
-            'phone'      => $request['phone'],
-            'is_active'  => STATUS_INACTIVE
+            'name'      => $request['name'],
+            'phone'     => $request['phone'],
+            'is_active' => STATUS_INACTIVE
         ];
-        $client           = $this->clientRep->create($dataCreateClient);
+        // Check and get admin_user_id
+        if (!empty($request['code'])) {
+            $admin_user = $this->adminUsersRep->findByAttributes(['code' => $request['code']]);
+            if (count($admin_user) > 0) {
+                $dataCreateClient['admin_user_id'] = $admin_user[0]->id;
+            }
+        }
+        $client = $this->clientRep->create($dataCreateClient);
 
         // Create Brand
         $dataCreateBrand = [
@@ -340,31 +359,52 @@ class AuthService extends BaseService
 
         // Create user
         $dataCreateUser = [
-            'client_id'  => $client->id,
-            'brand_id'   => $brand->id,
-            'first_name' => $request['first_name'],
-            'last_name'  => $request['last_name'],
-            'name'       => $request['name'],
-            'email'      => $request['email'],
-            'phone'      => $request['phone'],
-            'password'   => app('hash')->make($request['password']),
-            'is_active'  => STATUS_INACTIVE
+            'client_id' => $client->id,
+            'brand_id'  => $brand->id,
+            'name'      => $request['name'],
+            'email'     => $request['email'],
+            'phone'     => $request['phone'],
+            'password'  => app('hash')->make($request['password']),
+            'is_active' => STATUS_INACTIVE
         ];
         $user           = $this->userRep->create($dataCreateUser);
 
         $dataCreateRole = [
-            'user_id' => $user->id,
-            'role_id' => ROLE_MANAGER,
-            'is_active'  => STATUS_INACTIVE
+            'user_id'   => $user->id,
+            'role_id'   => ROLE_MANAGER,
+            'is_active' => STATUS_INACTIVE
         ];
         $this->userRoleRep->create($dataCreateRole);
 
+        // Send otp
+        $otp           = CommonHelper::createRandomOtp(4);
+        $dataCreateOtp = [
+            'otp'       => $otp,
+            'user_id'   => $user->id,
+            'is_verify' => STATUS_INACTIVE,
+            'type'      => TYPE_OTP_REGISTER,
+            'phone'     => $request['phone']
+        ];
+        $this->otpRep->create($dataCreateOtp);
+        // Send otp
+        $dataOtp = [
+            'u'     => USERNAME,
+            'pwd'   => PASSWORD,
+            'from'  => FROM,
+            'phone' => $request['phone'],
+            'sms'   => 'KAYLEE-Ma OTP cua ban la ' . $otp . '. Vui long nhap ma de tiep tuc',
+            'bid'   => CommonHelper::createRandomCode(),
+            'type'  => TYPE,
+            'json'  => JSON,
+        ];
+        Curl::callApi(LINK_OTP, $dataOtp);
+
         $msg          = new stdClass();
         $msg->title   = 'Thành công';
-        $msg->content = 'Tạo tài khoản thành công';
+        $msg->content = 'Hệ thống đã gửi mã xác thực qua số điện thoại, xin vui lòng nhập ở bước tiếp theo';
         $this->setMessage($msg);
         $this->setData([
-            'user_id'     => $user->id
+            'user_id' => $user->id
         ]);
 
         return $this->getResponseData();
@@ -379,8 +419,7 @@ class AuthService extends BaseService
         if (!empty($user)) {
             // Create user
             $dataCreateUser          = [
-                'first_name'  => $request['first_name'],
-                'last_name'   => $request['last_name'],
+                'name'        => $request['name'],
                 'address'     => $request['address'],
                 'birthday'    => $request['birthday'],
                 'city_id'     => $request['city_id'],

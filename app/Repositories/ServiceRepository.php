@@ -109,6 +109,7 @@ class ServiceRepository extends BaseRepository
         $query = $this->model
             ->select(
                 Service::getCol('id'),
+                Service::getCol('code'),
                 Service::getCol('name'),
                 Service::getCol('time'),
                 Service::getCol('price'),

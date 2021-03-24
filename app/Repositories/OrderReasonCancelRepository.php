@@ -18,6 +18,7 @@ class OrderReasonCancelRepository extends BaseRepository
         $result = $this->model
             ->select(['id', 'name', 'code'])
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->where('type', $type)
             ->get();
 

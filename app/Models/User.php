@@ -25,8 +25,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'password',
             'token_reset_password',
             'image',
-            'first_name',
-            'last_name',
+            'name',
             'name',
             'birthday',
             'phone',
@@ -77,6 +76,11 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     public function user_roles()
     {
         return $this->hasMany(UserRole::class, 'user_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
 }

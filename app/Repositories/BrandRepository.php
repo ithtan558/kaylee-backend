@@ -37,7 +37,8 @@ class BrandRepository extends BaseRepository
 
         $query = $this->model
             ->select('id', 'name', 'image', 'location', 'start_time', 'end_time')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('id', $user->brand_id);
@@ -67,6 +68,7 @@ class BrandRepository extends BaseRepository
         }
 
         $query = $query->where('is_active', STATUS_ACTIVE);
+        $query = $query->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('id', $user->brand_id);
@@ -82,8 +84,6 @@ class BrandRepository extends BaseRepository
             $arr = explode(',', $params['district_ids']);
             $query = $query->whereIn('district_id', $arr);
         }
-
-        $query = $query->where('is_delete', STATUS_INACTIVE);
 
         $query = $query->orderBy($order, $sort)
             ->paginate($length);

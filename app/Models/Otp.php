@@ -11,7 +11,8 @@ class Otp extends BaseModel
             'otp',
             'user_id',
             'tried',
-            'is_verify'
+            'is_verify',
+            'type'
         ];
 
 }

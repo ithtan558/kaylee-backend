@@ -11,8 +11,6 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 |
 */
 
-$namespace = 'App\Http\Controllers';
-
 $app->get('/', function () use ($app) {
     return $app->version();
 });
@@ -22,7 +20,7 @@ $app->get('/user-info', 'AuthController@getUserInfo');
 $app->get('/logout', 'AuthController@logout');
 $app->post('/forgot/verify-phone-and-send-otp', 'AuthController@verifyPhoneAndSendOtp');
 $app->post('/forgot/verify-otp', 'AuthController@verifyOtp');
-$app->post('/register/verify-otp', 'AuthController@verifyOtp');
+$app->post('/register/verify-otp', 'AuthController@verifyOtpForRegister');
 $app->post('/forgot/update-password', 'AuthController@updatePassword');
 $app->post('/login', 'AuthController@login');
 $app->post('/register', 'AuthController@register');
@@ -31,8 +29,7 @@ $app->post('/update', 'AuthController@update');
 // Role
 $app->group([
     'prefix'     => "/role",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'RoleController@getAll');
 });
@@ -40,8 +37,7 @@ $app->group([
 // City
 $app->group([
     'prefix'     => "/city",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'CityController@getAll');
 });
@@ -49,8 +45,7 @@ $app->group([
 // District
 $app->group([
     'prefix'     => "/district",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'DistrictController@getAll');
     $app->get('/list-by-city/{id}', 'DistrictController@getListByCity');
@@ -59,8 +54,7 @@ $app->group([
 // Wards
 $app->group([
     'prefix'     => "/wards",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'WardsController@getAll');
     $app->get('/list-by-district/{id}', 'WardsController@getListByDistrict');
@@ -69,8 +63,7 @@ $app->group([
 // Brand
 $app->group([
     'prefix'     => "/brand",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'BrandController@create');
     $app->get('/all', 'BrandController@getAll');
@@ -83,8 +76,7 @@ $app->group([
 // Service category
 $app->group([
     'prefix'     => "/service-category",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'ServiceCategoryController@create');
     $app->get('/all', 'ServiceCategoryController@getAll');
@@ -97,8 +89,7 @@ $app->group([
 // Service
 $app->group([
     'prefix'     => "/service",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'ServiceController@create');
     $app->get('/all', 'ServiceController@getAll');
@@ -111,8 +102,7 @@ $app->group([
 // Customer
 $app->group([
     'prefix'     => "/customer",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'CustomerController@create');
     $app->get('/all', 'CustomerController@getAll');
@@ -127,8 +117,7 @@ $app->group([
 // Customer type
 $app->group([
     'prefix'     => "/customer-type",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'CustomerTypeController@getAll');
 });
@@ -136,10 +125,10 @@ $app->group([
 // Order
 $app->group([
     'prefix'     => "/order",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'OrderController@create');
+    $app->get('/reason-cancel', 'OrderReasonCancelController@getAll');
     $app->get('/all', 'OrderController@getAll');
     $app->get('/get-count', 'OrderController@getCount');
     $app->get('/{id}', 'OrderController@getDetail');
@@ -151,8 +140,7 @@ $app->group([
 // Order Supplier
 $app->group([
     'prefix'     => "/supplier/order",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'OrderController@createSupplier');
     $app->post('/{id}', 'OrderController@updateSupplier');
@@ -161,8 +149,7 @@ $app->group([
 // Employee
 $app->group([
     'prefix'     => "/employee",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'EmployeeController@create');
     $app->get('/all', 'EmployeeController@getAll');
@@ -176,8 +163,7 @@ $app->group([
 // Report
 $app->group([
     'prefix'     => "/report",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/get-total', 'ReportController@getTotal');
     $app->get('/get-total-by-employee-date', 'ReportController@getTotalByEmployeeAndDate');
@@ -186,8 +172,7 @@ $app->group([
 
 // Content
 $app->group([
-    'prefix'    => "/content",
-    'namespace' => $namespace
+    'prefix'    => "/content"
 ], function () use ($app) {
     $app->get('/{slug}', 'ContentController@getDetail');
 });
@@ -195,8 +180,7 @@ $app->group([
 // Supplier
 $app->group([
     'prefix'     => "/supplier",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/', 'SupplierController@getList');
     $app->get('/{id}', 'SupplierController@getDetail');
@@ -205,8 +189,7 @@ $app->group([
 // Product category
 $app->group([
     'prefix'     => "/product-category",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'ProductCategoryController@create');
     $app->get('/all', 'ProductCategoryController@getAll');
@@ -219,8 +202,7 @@ $app->group([
 // Product
 $app->group([
     'prefix'     => "/product",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'ProductController@create');
     $app->get('/all', 'ProductController@getAll');
@@ -233,8 +215,7 @@ $app->group([
 // Notification
 $app->group([
     'prefix'     => "/notification",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/count-not-read', 'NotificationController@getCount');
     $app->post('/update-status', 'NotificationController@updateStatus');
@@ -249,8 +230,7 @@ $app->group([
 // Commission
 $app->group([
     'prefix'     => "/commission",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/detail', 'CommissionController@detail');
     $app->get('/product/list-order', 'CommissionController@getListProduct');
@@ -262,8 +242,7 @@ $app->group([
 // Reservation
 $app->group([
     'prefix'     => "/reservation",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->post('/', 'ReservationController@create');
     $app->get('/all', 'ReservationController@getAll');
@@ -277,8 +256,7 @@ $app->group([
 // Version
 $app->group([
     'prefix'     => "/version",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/', 'VersionController@getDetail');
 });
@@ -286,8 +264,15 @@ $app->group([
 // Campaign
 $app->group([
     'prefix'     => "/campaign",
-    'middleware' => ['jwt.auth'],
-    'namespace'  => $namespace
+    'middleware' => ['jwt.auth']
 ], function () use ($app) {
     $app->get('/all', 'CampaignController@getAll');
+});
+
+// Ads
+$app->group([
+    'prefix'     => "/ads",
+    'middleware' => ['jwt.auth']
+], function () use ($app) {
+    $app->get('/all', 'AdsController@getAll');
 });

@@ -8,6 +8,8 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderEmployee;
+use App\Models\OrderReasonCancel;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Role;
@@ -32,6 +34,7 @@ class OrderRepository extends BaseRepository
 
         $user  = CommonHelper::getAuth();
         $order  = 'id';
+        $params['order'] = 'DESC';
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
@@ -80,6 +83,9 @@ class OrderRepository extends BaseRepository
         $query = $query->orderBy($order, $sort)
             ->paginate($length);
 
+        $query->where(Order::getCol('is_delete'), STATUS_INACTIVE);
+        $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
+
         return $this->formatPagination($query);
 
     }
@@ -111,7 +117,8 @@ class OrderRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('brand_id', $user->brand_id);
@@ -138,6 +145,9 @@ class OrderRepository extends BaseRepository
             $query = $query->where('brand_id', $user->brand_id);
         }
 
+        $query->where('is_delete', STATUS_INACTIVE);
+        $query->where('is_active', STATUS_ACTIVE);
+
         $result = $query->count();
 
         return $result;
@@ -155,8 +165,7 @@ class OrderRepository extends BaseRepository
         $query = $this->model
             ->select(
                 DB::raw('SUM(' . Order::getCol('amount') . ') as amount'),
-                User::getCol('first_name'),
-                User::getCol('last_name'),
+                User::getCol('name'),
                 User::getCol('phone')
             )
             ->from(Order::getTbl())
@@ -170,6 +179,9 @@ class OrderRepository extends BaseRepository
         }
 
         $query->whereRaw('date(' . Order::getCol('created_at') . ') between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
+
+        $query->where(Order::getCol('is_delete'), STATUS_INACTIVE);
+        $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
 
         $result = $query->orderBy(Order::getCol('id'), 'DESC')
             ->groupBy(Order::getCol('employee_id'))->get();
@@ -206,6 +218,9 @@ class OrderRepository extends BaseRepository
 
         $query->whereRaw('date(' . Order::getCol('created_at') . ') between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
 
+        $query->where(Order::getCol('is_delete'), STATUS_INACTIVE);
+        $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
+
         $result = $query->orderBy(Order::getCol('id'), 'DESC')
             ->groupBy(OrderDetail::getCol('service_id'))->get();
 
@@ -234,11 +249,18 @@ class OrderRepository extends BaseRepository
                 Order::getCol('discount'),
                 Order::getCol('tax_value'),
                 Order::getCol('order_status_id'),
+                OrderReasonCancel::getCol('name as reason_name'),
+                OrderReasonCancel::getCol('id as reason_id'),
                 Order::getCol('supplier_id'),
-                User::getCol('first_name as employee_first_name'),
-                User::getCol('last_name as employee_last_name'),
                 Order::getCol('employee_id'),
+                Order::getCol('created_at'),
                 Brand::getCol('name as brand_name'),
+                'city_tmp.name as brand_city_name',
+                'district_tmp.name as brand_district_name',
+                'wards_tmp.name as brand_wards_name',
+                Brand::getCol('location as brand_location'),
+                Brand::getCol('phone as brand_phone'),
+                Brand::getCol('image as brand_image'),
                 Order::getCol('brand_id'),
                 Supplier::getCol('name as supplier_name'),
                 UserLocation::getCol('name as information_receive_name'),
@@ -256,6 +278,10 @@ class OrderRepository extends BaseRepository
             ->leftJoin(City::getTbl(), City::getCol('id'), '=', UserLocation::getCol('city_id'))
             ->leftJoin(District::getTbl(), District::getCol('id'), '=', UserLocation::getCol('district_id'))
             ->leftJoin(Wards::getTbl(), Wards::getCol('id'), '=', UserLocation::getCol('wards_id'))
+            ->leftJoin(City::getTbl() . " AS city_tmp", 'city_tmp.id', '=', Brand::getCol('city_id'))
+            ->leftJoin(District::getTbl() . " AS district_tmp", 'district_tmp.id', '=', Brand::getCol('district_id'))
+            ->leftJoin(Wards::getTbl() . " AS wards_tmp", 'wards_tmp.id', '=', Brand::getCol('wards_id'))
+            ->leftJoin(OrderReasonCancel::getTbl(), OrderReasonCancel::getCol('id'), '=', Order::getCol('order_reason_cancel_id'))
             ->where(Order::getCol('id'), $id)
             ->first();
 
@@ -285,6 +311,9 @@ class OrderRepository extends BaseRepository
             $query->whereRaw('date(created_at) between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
         }
 
+        $query->where('is_delete', STATUS_INACTIVE);
+        $query->where('is_active', STATUS_ACTIVE);
+
         $result = $query->orderBy('id', 'DESC')->get();
 
         $total_value = 0;
@@ -306,24 +335,28 @@ class OrderRepository extends BaseRepository
         }
 
         $query = $this->model
-            ->select('*');
+            ->select(Order::getCol('*'));
 
         if (in_array(ROLE_MANAGER, $roles)) {
-            $query = $query->where('client_id', $user->client_id);
+            $query = $query->where(OrderEmployee::getCol('client_id'), $user->client_id);
         }
         if (isset($params['brand_id']) && $params['brand_id']) {
-            $query = $query->where('brand_id', $params['brand_id']);
+            $query = $query->where(OrderEmployee::getCol('brand_id'), $params['brand_id']);
         }
 
-        $query = $query->where('employee_id', $params['user_id']);
+
+        $query = $query->join(OrderEmployee::getTbl(), OrderEmployee::getCol('order_id'), '=', Order::getCol('id'));
+        $query = $query->where(OrderEmployee::getCol('employee_id'), $params['user_id']);
 
         if (isset($params['start_date'])) {
-            $query->whereRaw('date(created_at) between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
+            $query->whereRaw('date('.Order::getCol('created_at').') between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
         }
 
-        $query = $query->with('order_details');
-        $result = $query->orderBy('id', 'DESC')->get();
+        $query->where(Order::getCol('is_delete'), STATUS_INACTIVE);
+        $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
 
+        $query = $query->with('order_details');
+        $result = $query->orderBy(OrderEmployee::getCol('id'), 'DESC')->get();
 
         return $result;
     }

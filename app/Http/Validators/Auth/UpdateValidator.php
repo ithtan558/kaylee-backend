@@ -9,8 +9,7 @@ class UpdateValidator implements AbstractValidator
     public static function rules()
     {
         return [
-            'first_name' => 'required',
-            'last_name'  => 'required',
+            'name'  => 'required',
             'email'      => 'email'
         ];
     }
@@ -21,8 +20,7 @@ class UpdateValidator implements AbstractValidator
     public static function messages()
     {
         return [
-            'first_name.required' => 'Tên bắt buộc.',
-            'last_name.required'  => 'Họ bắt buộc.',
+            'name.required'  => 'Họ tên bắt buộc.',
             'email.email'         => 'Email không đúng định dạng.'
         ];
     }

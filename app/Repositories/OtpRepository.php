@@ -20,12 +20,13 @@ class OtpRepository extends BaseRepository
         return $query;
     }
 
-    public function verifyByOtp($params)
+    public function verifyByOtp($params, $type)
     {
         $query = $this->model
             ->where('user_id', $params['user_id'])
             ->where('otp', $params['otp'])
             ->where('is_verify', STATUS_INACTIVE)
+            ->where('type', $type)
             ->first();
 
         return $query;

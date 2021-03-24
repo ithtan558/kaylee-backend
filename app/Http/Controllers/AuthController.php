@@ -57,7 +57,7 @@ class AuthController extends Controller
     public function verifyOtpForRegister()
     {
         $this->validate($this->request, VerifyOtpValidator::rules(), VerifyOtpValidator::messages());
-        $data = $this->authService->verifyOtp($this->request);
+        $data = $this->authService->verifyOtpForRegister($this->request);
 
         return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
     }

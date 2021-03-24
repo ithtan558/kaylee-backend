@@ -9,7 +9,6 @@ class Brand extends BaseModel
     protected $fillable
         = [
             'client_id',
-            'client_id',
             'name',
             'phone',
             'location',
@@ -19,6 +18,7 @@ class Brand extends BaseModel
             'image',
             'start_time',
             'end_time',
+            'is_active',
             'is_delete',
             'created_by',
             'updated_by'

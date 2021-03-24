@@ -10,6 +10,9 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\UserLocationRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ServiceRepository;
+use App\Repositories\AdminUsersRepository;
+use App\Repositories\OrderEmployeeRepository;
+use App\Repositories\UserRoleRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,6 +27,9 @@ class OrderService extends BaseService
     protected $userLocationRep;
     protected $productRep;
     protected $serviceRep;
+    protected $adminUsersRep;
+    protected $orderEmployeeRep;
+    protected $userRoleRep;
 
     public function __construct(
         OrderRepository $orderRep,
@@ -32,16 +38,22 @@ class OrderService extends BaseService
         CustomerRepository $customerRep,
         UserLocationRepository $userLocationRep,
         ProductRepository $productRep,
-        ServiceRepository $serviceRep
+        ServiceRepository $serviceRep,
+        AdminUsersRepository $adminUsersRep,
+        OrderEmployeeRepository $orderEmployeeRep,
+        UserRoleRepository $userRoleRep
     )
     {
-        $this->orderRep        = $orderRep;
-        $this->orderDetailRep  = $orderDetailRep;
-        $this->orderPaymentRep = $orderPaymentRep;
-        $this->customerRep     = $customerRep;
-        $this->userLocationRep = $userLocationRep;
-        $this->productRep      = $productRep;
-        $this->serviceRep      = $serviceRep;
+        $this->orderRep         = $orderRep;
+        $this->orderDetailRep   = $orderDetailRep;
+        $this->orderPaymentRep  = $orderPaymentRep;
+        $this->customerRep      = $customerRep;
+        $this->userLocationRep  = $userLocationRep;
+        $this->productRep       = $productRep;
+        $this->serviceRep       = $serviceRep;
+        $this->adminUsersRep    = $adminUsersRep;
+        $this->orderEmployeeRep = $orderEmployeeRep;
+        $this->userRoleRep = $userRoleRep;
     }
 
     public function getList(Request $request)
@@ -71,7 +83,7 @@ class OrderService extends BaseService
             $items                = $request['cart_items'];
             $customer             = $request['cart_customer'];
             $discount             = $request['cart_discount'];
-            $employee             = $request['cart_employee'];
+            $employees             = $request['cart_employees'];
             $supplier_information = $request['cart_supplier_information'];
             // Check exist customer of not
             if (!empty($customer)) {
@@ -79,20 +91,18 @@ class OrderService extends BaseService
                     $customer_id = $customer['id'];
                 } else {
                     // Check exist customer before by phone
-                    $customer_query = $this->customerRep->findByAttributes(['phone' => $customer['phone']]);
+                    if (empty($customer['phone'])) {
+                        $phone = NUMBER_PREFIXES[array_rand(NUMBER_PREFIXES)] . CommonHelper::randomNumberSequence();
+                    } else {
+                        $phone = $customer['phone'];
+                    }
+                    $customer_query = $this->customerRep->findByAttributes(['phone' => $phone]);
                     if (count($customer_query) > 0) {
                         $customer_id = $customer_query[0]->id;
                     } else {
-                        // Check if phone = null -> auto create 1 number phone for them by generate number phone
-                        if (empty($customer['phone'])) {
-                            $phone = NUMBER_PREFIXES[array_rand(NUMBER_PREFIXES)].CommonHelper::randomNumberSequence();
-                        } else {
-                            $phone = $customer['phone'];
-                        }
                         $dataInsertCustomer = [
                             'client_id'        => $this->getCurrentUser('client_id'),
-                            'first_name'       => isset($customer['first_name']) ? $customer['first_name']: '',
-                            'last_name'        => $customer['last_name'],
+                            'name'        => $customer['name'],
                             'hometown_city_id' => isset($customer['hometown_city_id']) ? $customer['hometown_city_id'] : 0,
                             'city_id'          => isset($customer['city_id']) ? $customer['city_id'] : 0,
                             'district_id'      => isset($customer['district_id']) ? $customer['district_id'] : 0,
@@ -117,23 +127,22 @@ class OrderService extends BaseService
             // Insert order
             // Set status for order
             $order_status_id = ORDER_STATUS_NOT_PAID;
-            $is_paid = 0;
+            $is_paid         = 0;
             if (isset($request['supplier_id'])) {
                 $order_status_id = ORDER_STATUS_WAITING;
-                $is_paid = 1;
+                $is_paid         = 1;
             } elseif (isset($request['is_paid'])) {
                 $order_status_id = ORDER_STATUS_FINISHED;
-                $is_paid = 1;
+                $is_paid         = 1;
             }
             $dataInsertOrder = [
                 'client_id'       => $this->getCurrentUser('client_id'),
                 'brand_id'        => isset($request['brand_id']) ? $request['brand_id'] : $this->getCurrentUser('brand_id'),
-                'employee_id'     => isset($request['supplier_id']) ? $this->getCurrentUser('id') : $employee,
                 'customer_id'     => isset($request['supplier_id']) ? $this->getCurrentUser('id') : $customer_id,
                 'order_status_id' => $order_status_id,
                 'is_paid'         => $is_paid,
                 'supplier_id'     => isset($request['supplier_id']) ? $request['supplier_id'] : 0,
-                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['last_name'] . ' ' . $customer['first_name'],
+                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['name'],
                 'phone'           => isset($request['supplier_id']) ? $supplier_information['phone'] : $customer['phone'],
                 'note'            => isset($request['supplier_id']) ? $supplier_information['note'] : '',
                 'amount'          => 0,
@@ -142,6 +151,21 @@ class OrderService extends BaseService
             ];
             $order           = $this->orderRep->create($dataInsertOrder);
 
+            // Create order employee
+            if (!empty($employees)) {
+                foreach ($employees as $employee) {
+                    $dataInsertOrderEmployee = [
+                        'client_id'       => $this->getCurrentUser('client_id'),
+                        'brand_id'        => isset($request['brand_id']) ? $request['brand_id'] : $this->getCurrentUser('brand_id'),
+                        'employee_id'     => $employee,
+                        'order_id'     => $order->id,
+                        'created_by'      => $this->getCurrentUser('id')
+                    ];
+                    $this->orderEmployeeRep->create($dataInsertOrderEmployee);
+                }
+            }
+
+            $dataInsertOrder['id'] = $order->id;
             // Insert user location
             if (!empty($request['supplier_id'])) {
                 $dataInsertUserLocation = [
@@ -269,8 +293,7 @@ class OrderService extends BaseService
                     } else {
                         $dataInsertCustomer = [
                             'client_id'        => $this->getCurrentUser('client_id'),
-                            'first_name'       => $customer['first_name'],
-                            'last_name'        => $customer['last_name'],
+                            'name'        => $customer['name'],
                             'hometown_city_id' => isset($customer['hometown_city_id']) ? $customer['hometown_city_id'] : 0,
                             'city_id'          => isset($customer['city_id']) ? $customer['city_id'] : 0,
                             'district_id'      => isset($customer['district_id']) ? $customer['district_id'] : 0,
@@ -295,15 +318,15 @@ class OrderService extends BaseService
             // Insert order
             // Set status for order
             $order_status_id = ORDER_STATUS_NOT_PAID;
-            $is_paid = 0;
+            $is_paid         = 0;
             if (isset($request['supplier_id'])) {
                 $order_status_id = ORDER_STATUS_WAITING;
-                $is_paid = 1;
+                $is_paid         = 1;
             } elseif (isset($request['is_paid'])) {
                 $order_status_id = ORDER_STATUS_FINISHED;
-                $is_paid = 1;
+                $is_paid         = 1;
             }
-            $dataInsertOrder = [
+            $dataInsertOrder       = [
                 'client_id'       => $this->getCurrentUser('client_id'),
                 'brand_id'        => isset($request['brand_id']) ? $request['brand_id'] : $this->getCurrentUser('brand_id'),
                 'employee_id'     => isset($request['supplier_id']) ? $this->getCurrentUser('id') : $employee,
@@ -311,14 +334,15 @@ class OrderService extends BaseService
                 'order_status_id' => $order_status_id,
                 'is_paid'         => $is_paid,
                 'supplier_id'     => isset($request['supplier_id']) ? $request['supplier_id'] : 0,
-                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['last_name'] . ' ' . $customer['first_name'],
+                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['name'],
                 'phone'           => isset($request['supplier_id']) ? $supplier_information['phone'] : $customer['phone'],
                 'note'            => isset($request['supplier_id']) ? $supplier_information['note'] : '',
                 'amount'          => 0,
                 'discount'        => 0,
                 'created_by'      => $this->getCurrentUser('id')
             ];
-            $order           = $this->orderRep->create($dataInsertOrder);
+            $order                 = $this->orderRep->create($dataInsertOrder);
+            $dataInsertOrder['id'] = $order->id;
 
             // Insert user location
             if (!empty($request['supplier_id'])) {
@@ -401,10 +425,17 @@ class OrderService extends BaseService
             }
 
             // Update amount for order
+            $commission    = 0;
+            $admin_user_id = $this->getCurrentUser()->client->admin_user_id;
+            $admin_user    = $this->adminUsersRep->find($admin_user_id);
+            if (!empty($admin_user)) {
+                $commission = ($admin_user->percent / 100) * ($amount - (($amount * $discount) / 100));
+            }
             $this->orderRep->update([
-                'amount'   => $amount - (($amount * $discount) / 100),
-                'discount' => ($amount * $discount) / 100,
-                'code'     => CommonHelper::createRandomCode($order['id'])
+                'commission' => $commission,
+                'amount'     => $amount - (($amount * $discount) / 100),
+                'discount'   => ($amount * $discount) / 100,
+                'code'       => CommonHelper::createRandomCode($order['id'])
             ],
                 $order['id']
             );
@@ -429,18 +460,19 @@ class OrderService extends BaseService
 
     public function update(Request $request)
     {
+
         try {
             $items                = $request['cart_items'];
             $customer             = $request['cart_customer'];
             $discount             = $request['cart_discount'];
-            $employee             = $request['cart_employee'];
+            $employees             = $request['cart_employees'];
             $supplier_information = $request['cart_supplier_information'];
             $id                   = $request['id'];
 
             // Delete all old information with current order
             $this->orderRep->delete(['id' => $id]);
             $this->orderDetailRep->delete(['order_id' => $id]);
-            $this->orderDetailRep->delete(['order_id' => $id]);
+            $this->orderEmployeeRep->delete(['order_id' => $id]);
             if (!empty($request['supplier_id'])) {
                 $this->userLocationRep->delete(['order_id' => $id]);
             }
@@ -449,6 +481,7 @@ class OrderService extends BaseService
             if (!empty($customer)) {
                 if (isset($customer['id'])) {
                     $customer_id = $customer['id'];
+                    $customer = $this->customerRep->find($customer_id)->toArray();
                 } else {
                     // Check exist customer before by phone
                     $customer_query = $this->customerRep->findByAttributes(['phone' => $customer['phone']]);
@@ -457,8 +490,7 @@ class OrderService extends BaseService
                     } else {
                         $dataInsertCustomer = [
                             'client_id'        => $this->getCurrentUser('client_id'),
-                            'first_name'       => $customer['first_name'],
-                            'last_name'        => $customer['last_name'],
+                            'name'        => $customer['name'],
                             'hometown_city_id' => isset($customer['hometown_city_id']) ? $customer['hometown_city_id'] : 0,
                             'city_id'          => isset($customer['city_id']) ? $customer['city_id'] : 0,
                             'district_id'      => isset($customer['district_id']) ? $customer['district_id'] : 0,
@@ -483,20 +515,19 @@ class OrderService extends BaseService
             // Insert order
             // Set status for order
             $order_status_id = ORDER_STATUS_NOT_PAID;
-            $is_paid = 0;
+            $is_paid         = 0;
             if (isset($request['is_paid'])) {
                 $order_status_id = ORDER_STATUS_FINISHED;
-                $is_paid = 1;
+                $is_paid         = 1;
             }
             $dataInsertOrder = [
                 'client_id'       => $this->getCurrentUser('client_id'),
                 'brand_id'        => isset($request['brand_id']) ? $request['brand_id'] : $this->getCurrentUser('brand_id'),
-                'employee_id'     => isset($request['supplier_id']) ? $this->getCurrentUser('id') : $employee,
                 'customer_id'     => isset($request['supplier_id']) ? $this->getCurrentUser('id') : $customer_id,
                 'order_status_id' => $order_status_id,
                 'is_paid'         => $is_paid,
                 'supplier_id'     => isset($request['supplier_id']) ? $request['supplier_id'] : 0,
-                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['first_name'] . ' ' . $customer['last_name'],
+                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['name'] ,
                 'phone'           => isset($request['supplier_id']) ? $supplier_information['phone'] : $customer['phone'],
                 'note'            => isset($request['supplier_id']) ? $supplier_information['note'] : '',
                 'amount'          => 0,
@@ -504,6 +535,20 @@ class OrderService extends BaseService
                 'created_by'      => $this->getCurrentUser('id')
             ];
             $order           = $this->orderRep->create($dataInsertOrder);
+
+            // Create order employee
+            if (!empty($employees)) {
+                foreach ($employees as $employee) {
+                    $dataInsertOrderEmployee = [
+                        'client_id'       => $this->getCurrentUser('client_id'),
+                        'brand_id'        => isset($request['brand_id']) ? $request['brand_id'] : $this->getCurrentUser('brand_id'),
+                        'employee_id'     => $employee,
+                        'order_id'     => $order->id,
+                        'created_by'      => $this->getCurrentUser('id')
+                    ];
+                    $this->orderEmployeeRep->create($dataInsertOrderEmployee);
+                }
+            }
 
             // Insert user location
             if (!empty($request['supplier_id'])) {
@@ -625,7 +670,6 @@ class OrderService extends BaseService
             // Delete all old information with current order
             $this->orderRep->delete(['id' => $id]);
             $this->orderDetailRep->delete(['order_id' => $id]);
-            $this->orderDetailRep->delete(['order_id' => $id]);
             if (!empty($request['supplier_id'])) {
                 $this->userLocationRep->delete(['order_id' => $id]);
             }
@@ -642,8 +686,7 @@ class OrderService extends BaseService
                     } else {
                         $dataInsertCustomer = [
                             'client_id'        => $this->getCurrentUser('client_id'),
-                            'first_name'       => $customer['first_name'],
-                            'last_name'        => $customer['last_name'],
+                            'name'        => $customer['name'],
                             'hometown_city_id' => isset($customer['hometown_city_id']) ? $customer['hometown_city_id'] : 0,
                             'city_id'          => isset($customer['city_id']) ? $customer['city_id'] : 0,
                             'district_id'      => isset($customer['district_id']) ? $customer['district_id'] : 0,
@@ -668,10 +711,10 @@ class OrderService extends BaseService
             // Insert order
             // Set status for order
             $order_status_id = ORDER_STATUS_NOT_PAID;
-            $is_paid = 0;
+            $is_paid         = 0;
             if (isset($request['is_paid'])) {
                 $order_status_id = ORDER_STATUS_FINISHED;
-                $is_paid = 1;
+                $is_paid         = 1;
             }
             $dataInsertOrder = [
                 'client_id'       => $this->getCurrentUser('client_id'),
@@ -681,7 +724,7 @@ class OrderService extends BaseService
                 'order_status_id' => $order_status_id,
                 'is_paid'         => $is_paid,
                 'supplier_id'     => isset($request['supplier_id']) ? $request['supplier_id'] : 0,
-                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['first_name'] . ' ' . $customer['last_name'],
+                'name'            => isset($request['supplier_id']) ? $supplier_information['name'] : $customer['name'],
                 'phone'           => isset($request['supplier_id']) ? $supplier_information['phone'] : $customer['phone'],
                 'note'            => isset($request['supplier_id']) ? $supplier_information['note'] : '',
                 'amount'          => 0,
@@ -820,6 +863,8 @@ class OrderService extends BaseService
 
         $order_details = $this->orderDetailRep->getByOrderId($id);
 
+        $order_employees = $this->orderEmployeeRep->getByOrderId($id);
+
         if (empty($data->supplier_id)) {
             unset($data->information_receive_name);
             unset($data->information_receive_phone);
@@ -829,10 +874,11 @@ class OrderService extends BaseService
             unset($data->information_receive_wards_name);
             unset($data->information_receive_note);
             unset($data->supplier_name);
+            unset($data->supplier_id);
         }
 
         // Convert into customer object
-        $obj = new stdClass();
+        $obj       = new stdClass();
         $obj->name = $data->name;
         unset($data->name);
         $obj->phone = $data->phone;
@@ -843,23 +889,46 @@ class OrderService extends BaseService
         unset($data->customer_id);
         $data->customer = $obj;
 
-        // Convert into employee object
-        $obj_employee = new stdClass();
-        $obj_employee->first_name = $data->employee_first_name;
-        unset($data->employee_first_name);
-        $obj_employee->last_name = $data->employee_last_name;
-        unset($data->employee_last_name);
-        $obj_employee->id = $data->employee_id;
-        unset($data->employee_id);
-        $data->employee = $obj_employee;
+        // Convert into employees array
+        $employees = [];
+        if (!empty($order_employees)) {
+            foreach ($order_employees as $order_employee) {
+                $obj_employee             = new stdClass();
+                $obj_employee->name = $order_employee->name;
+                $obj_employee->id = $order_employee->id;
+                $obj_role = new stdClass();
+                $obj_role->id = $order_employee->role_id;
+                $obj_role->name = $order_employee->role_name;
+                $obj_employee->role = $obj_role;
+                $employees[] = $obj_employee;
+            }
+        }
+        $data->employees = $employees;
 
         // Convert into brand object
-        $obj_brand = new stdClass();
+        $obj_brand       = new stdClass();
         $obj_brand->name = $data->brand_name;
         unset($data->brand_name);
-        $obj_brand->id = $data->brand_id;
+        $obj_brand->id      = $data->brand_id;
+        $obj_brand->address = CommonHelper::fullAddress($data->brand_city_name, $data->brand_district_name, $data->brand_wards_name, $data->brand_location);
+        $obj_brand->phone   = $data->brand_phone;
+        $obj_brand->logo    = PATH_IMAGE . $data->brand_image;
+        unset($data->brand_city_name);
+        unset($data->brand_district_name);
+        unset($data->brand_wards_name);
+        unset($data->brand_location);
+        unset($data->brand_phone);
         unset($data->brand_id);
+        unset($data->brand_image);
         $data->brand = $obj_brand;
+
+        // Convert into order cancel object
+        $obj_reason       = new stdClass();
+        $obj_reason->id   = $data->reason_id;
+        $obj_reason->name = $data->reason_name;
+        unset($data->reason_id);
+        unset($data->reason_name);
+        $data->order_reason_cancel = $obj_reason;
 
         if (!empty($data)) {
             $data->order_details = $order_details;
@@ -872,7 +941,11 @@ class OrderService extends BaseService
 
     public function updateStatus($params)
     {
-        $this->orderRep->update(["order_status_id" => $params['order_status_id']], $params['id']);
+        $data_update = ["order_status_id" => $params['order_status_id']];
+        if (isset($params['order_reason_cancel_id'])) {
+            $data_update['order_reason_cancel_id'] = $params['order_reason_cancel_id'];
+        }
+        $this->orderRep->update($data_update, $params['id']);
         $msg          = new stdClass();
         $msg->title   = 'Thành công';
         $msg->content = 'Cập nhật trạng thái đơn hàng thành công';

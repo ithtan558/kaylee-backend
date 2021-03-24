@@ -10,9 +10,8 @@ class ReservationCreateValidator implements AbstractValidator
     {
         return [
             'brand_id' => 'required',
-            'first_name' => 'required',
-            'last_name'  => 'required',
-            'phone'      => 'required|numeric|unique:customer,phone'
+            'name'  => 'required',
+            'phone'      => 'required|numeric'
         ];
     }
 
@@ -23,10 +22,8 @@ class ReservationCreateValidator implements AbstractValidator
     {
         return [
             'brand_id.required' => 'Chi nhánh bắt buộc.',
-            'first_name.required' => 'Họ bắt buộc.',
-            'last_name.required'  => 'Tên bắt buộc.',
+            'name.required' => 'Họ tên bắt buộc.',
             'phone.required'      => 'Số điện thoại bắt buộc.',
-            'phone.unique'        => 'Số điện thoại đã tồn tại.',
             'phone.numeric'       => 'Số điện thoại chưa đúng định dạng.'
         ];
     }

@@ -57,6 +57,7 @@ class CommissionService extends BaseService
             $commission_service->total      = 0;
             $commission_service->commission = 0;
             foreach ($orders as $item) {
+
                 foreach ($item->order_details as $order_detail) {
                     if (!empty($order_detail->product_id)) {
                         $commission_product->total      += $order_detail->total;
@@ -88,6 +89,7 @@ class CommissionService extends BaseService
 
         $user_config_commission = $this->userConfigCommissionRep->findByAUserId(['user_id' => $request['user_id']]);
         if ($commission_product) {
+            dd($data['items']);
             foreach ($data['items'] as $index => &$item) {
                 $item->commission_product = 0;
                 foreach ($item->order_details as $order_detail) {

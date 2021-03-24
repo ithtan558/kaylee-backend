@@ -133,7 +133,6 @@ class ServiceService extends BaseService
             if ($name) {
                 $dataUpdate['image'] = $name;
             }
-
             $this->serviceRep->update($dataUpdate, $request['id']);
 
             // Delete all brand service of this service first

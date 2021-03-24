@@ -270,7 +270,7 @@ class BaseRepository
 
     public function getOrder($params)
     {
-        return isset($params['order']) && in_array($params['order'], $this->orderAble) ? $params['order'] : $this->orderAble[0];
+        return isset($params['order']) && in_array($params['order'], $this->orderAble) ? $params['order'] : $this->orderAble[2];
     }
 
     public function getSortColumn($params, $defaultSorting = '', $sortableColumn = [])

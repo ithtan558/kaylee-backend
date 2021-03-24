@@ -32,6 +32,7 @@ class RoleRepository extends BaseRepository
         $result = $this->model
             ->select(['id', 'name', 'code', 'description'])
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->whereNotIn('id', $reject_roles)
             ->get();
 

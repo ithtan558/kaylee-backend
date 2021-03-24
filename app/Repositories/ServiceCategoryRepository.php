@@ -38,7 +38,7 @@ class ServiceCategoryRepository extends BaseRepository
             ->where('is_active', STATUS_ACTIVE)
             ->where('is_delete', STATUS_INACTIVE);
 
-        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles)) {
+        if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('client_id', $user->client_id);
         }
 

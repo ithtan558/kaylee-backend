@@ -16,6 +16,7 @@ class CategoryContentRepository extends BaseRepository
         $result = $this->model
             ->select('*')
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->orderBy('name', 'DESC')
             ->get();
 

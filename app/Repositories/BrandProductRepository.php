@@ -30,6 +30,7 @@ class BrandProductRepository extends BaseRepository
         $result = $this->model
             ->select('*')
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->orderBy('id', 'DESC')
             ->get();
 
@@ -44,6 +45,8 @@ class BrandProductRepository extends BaseRepository
 
         $query = $this->model
             ->select("*")
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->orderBy($order, $sort)
             ->paginate($length);
 

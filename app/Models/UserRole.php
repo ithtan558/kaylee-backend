@@ -11,6 +11,8 @@ class UserRole extends BaseModel
             'id',
             'user_id',
             'role_id',
+            'is_active',
+            'is_delete',
             'created_by',
             'updated_by'
         ];

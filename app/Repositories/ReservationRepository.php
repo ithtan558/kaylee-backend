@@ -18,7 +18,7 @@ class ReservationRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [Reservation::getCol('first_name'), Reservation::getCol('last_name'), Reservation::getCol('phone')],
+                'field'   => [Reservation::getCol('name'), Reservation::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -36,7 +36,8 @@ class ReservationRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('client_id', $user->client_id);
@@ -56,8 +57,7 @@ class ReservationRepository extends BaseRepository
         $query = $this->model->select(
             Reservation::getCol('id'),
             Reservation::getCol('code'),
-            Reservation::getCol('first_name'),
-            Reservation::getCol('last_name'),
+            Reservation::getCol('name'),
             Reservation::getCol('status'),
             Reservation::getCol('quantity'),
             Reservation::getCol('datetime'),
@@ -88,6 +88,9 @@ class ReservationRepository extends BaseRepository
         if (!empty($params['datetime'])) {
             $query = $query->whereDate(Reservation::getCol('datetime'), '=', $params['datetime']);
         }
+
+        $query->where(Reservation::getCol('is_active'), STATUS_ACTIVE);
+        $query->where(Reservation::getCol('is_delete'), STATUS_INACTIVE);
 
         $query = $query->orderBy($order, $sort)
             ->paginate($length);
@@ -126,8 +129,7 @@ class ReservationRepository extends BaseRepository
                 Reservation::getCol("id"),
                 Reservation::getCol("brand_id"),
                 Reservation::getCol("code"),
-                Reservation::getCol("first_name"),
-                Reservation::getCol("last_name"),
+                Reservation::getCol("name"),
                 Reservation::getCol("phone"),
                 Reservation::getCol("address"),
                 Reservation::getCol("city_id"),
@@ -156,7 +158,8 @@ class ReservationRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             //$query = $query->where('brand_id', $user->brand_id);

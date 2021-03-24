@@ -86,7 +86,7 @@ class BaseService
         if ($status_code == Response::HTTP_OK) {
             $this->message = $mgs;
         } else {
-            $this->message = 'Lỗi';
+            $this->message = null;
         }
         $this->data       = $data;
         $this->statusCode = $status_code;

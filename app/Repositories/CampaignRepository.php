@@ -25,6 +25,7 @@ class CampaignRepository extends BaseRepository
         $result = $this->model
             ->select(['id', 'key', 'content'])
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->get();
 
         return $result;

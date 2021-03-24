@@ -91,8 +91,7 @@ class ReservationService extends BaseService
             if (count($customer_query) == 0) {
                 $dataInsertCustomer = [
                     'client_id'        => $this->getCurrentUser('client_id'),
-                    'first_name'       => $request['first_name'],
-                    'last_name'        => $request['last_name'],
+                    'name'        => $request['name'],
                     'hometown_city_id' => isset($request['hometown_city_id']) ? $request['hometown_city_id'] : 0,
                     'city_id'          => isset($request['city_id']) ? $request['city_id'] : 0,
                     'district_id'      => isset($request['district_id']) ? $request['district_id'] : 0,
@@ -112,8 +111,7 @@ class ReservationService extends BaseService
                 'client_id'   => $this->getCurrentUser('client_id'),
                 'brand_id'    => $request['brand_id'],
                 'customer_id' => $customer_id,
-                'first_name'  => $request['first_name'],
-                'last_name'   => $request['last_name'],
+                'name'   => $request['name'],
                 'address'     => $request['address'],
                 'city_id'     => $request['city_id'],
                 'district_id' => $request['district_id'],
@@ -153,8 +151,7 @@ class ReservationService extends BaseService
             $dataUpdate = [
                 'client_id'   => $this->getCurrentUser('client_id'),
                 'brand_id'    => $request['brand_id'],
-                'first_name'  => $request['first_name'],
-                'last_name'   => $request['last_name'],
+                'name'   => $request['name'],
                 'address'     => $request['address'],
                 'city_id'     => $request['city_id'],
                 'district_id' => $request['district_id'],

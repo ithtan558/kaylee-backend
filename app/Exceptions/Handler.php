@@ -60,7 +60,7 @@ class Handler extends ExceptionHandler
             $errors = CommonHelper::formatErrorsMessage($errors);
 
             return Api::response([
-                'message' => 'Lỗi!',
+                'message' => null,
                 'data'    => [
                     'errors' => $errors
                 ]

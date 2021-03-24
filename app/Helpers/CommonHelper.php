@@ -127,9 +127,26 @@ class CommonHelper
             for ($i = 0; $i <= 10; $i++) {
                 $randomString .= $characters[rand(0, $charactersLength - 1)];
             }
-            $order = Order::where("code", 1)->get()->pluck("value", "key");
+            $order = Order::where("code", $randomString)->get()->pluck("value", "key");
             if (count($order) == 0)
                 break;
+        } while(true);
+
+        return $randomString;
+    }
+
+    public static function createRandomOtp($length = 4)
+    {
+
+
+        $characters = '0123456789';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        do {
+            for ($i = 0; $i <= 3; $i++) {
+                $randomString .= $characters[rand(0, $charactersLength - 1)];
+            }
+            break;
         } while(true);
 
         return $randomString;
@@ -141,6 +158,10 @@ class CommonHelper
             $sequence .= mt_rand(0, $highestDigit);
         }
         return $sequence;
+    }
+
+    public static function fullAddress($city, $district, $wards, $location) {
+        return $location .', '. $wards .' - '. $district .' - '. $city;
     }
 
 }

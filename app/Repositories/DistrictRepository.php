@@ -16,6 +16,7 @@ class DistrictRepository extends BaseRepository
         $result = $this->model
             ->select('id', 'name', 'city_id')
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->get();
 
         return $result;
@@ -26,6 +27,7 @@ class DistrictRepository extends BaseRepository
         $result = $this->model
             ->select('id', 'name','city_id')
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->where('city_id', $city_id)
             ->get();
 

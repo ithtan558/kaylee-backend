@@ -71,11 +71,152 @@ class ProductService extends BaseService
         unset($data->category_id);
         unset($data->category_name);
 
+        $images = [];
         if (!empty($data->supplier_id)) {
-            $data->image = PATH_IMAGE_SUPPLIER . $data->image;
+
+            if (!empty($data->video)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->video;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video1)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->video1;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video2)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->video2;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video3)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->video3;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video4)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->video4;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->image)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->image;
+                $images[] = $obj;
+            }
+            if (!empty($data->image1)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->image1;
+                $images[] = $obj;
+            }
+            if (!empty($data->image2)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->image2;
+                $images[] = $obj;
+            }
+            if (!empty($data->image3)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->image3;
+                $images[] = $obj;
+            }
+            if (!empty($data->image4)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE_SUPPLIER.$data->image4;
+                $images[] = $obj;
+            }
+
+            $data->images = $images;
         } else {
-            $data->image = PATH_IMAGE . $data->image;
+
+            if (!empty($data->video)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE.$data->video;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video1)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE.$data->video1;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video2)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE.$data->video2;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video3)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE.$data->video3;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->video4)) {
+                $obj = new stdClass();
+                $obj->type = 2;
+                $obj->value = PATH_IMAGE.$data->video4;
+                $images[] = $obj;
+            }
+
+            if (!empty($data->image)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE.$data->image;
+                $images[] = $obj;
+            }
+            if (!empty($data->image1)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE.$data->image1;
+                $images[] = $obj;
+            }
+            if (!empty($data->image2)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE.$data->image2;
+                $images[] = $obj;
+            }
+            if (!empty($data->image3)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE.$data->image3;
+                $images[] = $obj;
+            }
+            if (!empty($data->image4)) {
+                $obj = new stdClass();
+                $obj->type = 1;
+                $obj->value = PATH_IMAGE.$data->image4;
+                $images[] = $obj;
+            }
+
+            $data->images = $images;
         }
+        unset($data->image);
+        unset($data->image1);
+        unset($data->image2);
+        unset($data->image3);
+        unset($data->image4);
+        unset($data->video);
 
         $this->setData($data);
 

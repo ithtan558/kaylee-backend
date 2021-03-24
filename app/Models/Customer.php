@@ -10,8 +10,7 @@ class Customer extends BaseModel
         = [
             'client_id',
             'type_id',
-            'first_name',
-            'last_name',
+            'name',
             'birthday',
             'hometown_city_id',
             'city_id',

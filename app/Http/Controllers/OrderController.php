@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Validators\Order\OrderCreateValidator;
 use App\Http\Validators\Order\OrderUpdateStatusValidator;
 use App\Http\Validators\Order\OrderUpdateValidator;
-use App\Http\Validators\Order\ReportTotalValidator;
 use App\Http\Validators\Order\SupplierOrderCreateValidator;
 use App\Http\Validators\Order\SupplierOrderUpdateValidator;
 use Illuminate\Http\Request;

@@ -16,7 +16,7 @@ class CustomerRepository extends BaseRepository
     {
         return [
             'keyword' => [
-                'field'   => [Customer::getCol('first_name'), Customer::getCol('last_name'), Customer::getCol('phone')],
+                'field'   => [Customer::getCol('name'), Customer::getCol('phone')],
                 'compare' => 'like',
                 'type'    => 'string',
             ],
@@ -34,7 +34,8 @@ class CustomerRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('client_id', $user->client_id);
@@ -51,7 +52,7 @@ class CustomerRepository extends BaseRepository
         $length = $this->getLength($params);
         $sort   = $this->getOrder($params);
 
-        $query = $this->model->select(["id", "first_name", "last_name", "phone", "image"]);
+        $query = $this->model->select(["id", "name", "phone", "image"]);
         // Filter base on roles of user
         $user  = CommonHelper::getAuth();
         $roles = [];
@@ -90,7 +91,7 @@ class CustomerRepository extends BaseRepository
         $order = 'id';
         $sort  = $this->getOrder($params);
 
-        $query = $this->model->select(["id", "first_name", "last_name", "phone"]);
+        $query = $this->model->select(["id", "name", "phone"]);
         $query = $this->addConditionToQuery($query, $params, $this->getFieldSearchAble());
 
         // Filter base on roles of user
@@ -117,8 +118,6 @@ class CustomerRepository extends BaseRepository
                 "name",
                 "phone",
                 "image",
-                "first_name",
-                "last_name",
                 "hometown_city_id",
                 "address",
                 "city_id",
@@ -144,7 +143,8 @@ class CustomerRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             //$query = $query->where('brand_id', $user->brand_id);

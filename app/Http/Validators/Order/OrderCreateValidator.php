@@ -10,8 +10,8 @@ class OrderCreateValidator implements AbstractValidator
     {
         return [
             'cart_items'    => 'required|array',
-            'cart_employee' => 'required',
-            'cart_customer.last_name' => 'required'
+            'cart_employees' => 'required',
+            'cart_customer.name' => 'required'
         ];
     }
 
@@ -23,8 +23,8 @@ class OrderCreateValidator implements AbstractValidator
         return [
             'cart_items.required'    => 'Không có dịch vụ nào trong giỏ hàng.',
             'cart_items.array'       => 'Không có dịch vụ nào trong giỏ hàng.',
-            'cart_employee.required' => 'Chưa chọn nhân viên.',
-            'cart_customer.last_name.required' => 'Chưa chọn khách hàng'
+            'cart_employees.required' => 'Chưa chọn nhân viên.',
+            'cart_customer.name.required' => 'Chưa chọn khách hàng'
         ];
     }
 }

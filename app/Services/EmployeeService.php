@@ -63,6 +63,15 @@ class EmployeeService extends BaseService
     public function getByPhoneOrName(Request $request)
     {
         $data = $this->userRep->getByPhoneOrName($request->all());
+        $roles = $this->roleRep->getAll()->keyBy('id');
+        foreach ($data as &$item) {
+            $obj = new stdClass();
+            $user_roles = $item->user_roles;
+            $obj->id = $user_roles[0]->id;
+            $obj->name = $roles[$user_roles[0]->role_id]->name;
+            $item->role = $obj;
+            unset($item->user_roles);
+        }
         $this->setData($data);
 
         return $this->getResponseData();
@@ -93,8 +102,7 @@ class EmployeeService extends BaseService
 
         $dataCreate = [
             'client_id'        => $this->getCurrentUser('client_id'),
-            'first_name'       => $request['first_name'],
-            'last_name'        => $request['last_name'],
+            'name'        => $request['name'],
             'birthday'         => $request['birthday'],
             'hometown_city_id' => $request['hometown_city_id'],
             'address'          => $request['address'],
@@ -132,8 +140,7 @@ class EmployeeService extends BaseService
 
         $dataUpdate = [
             'client_id'        => $this->getCurrentUser('client_id'),
-            'first_name'       => $request['first_name'],
-            'last_name'        => $request['last_name'],
+            'name'        => $request['name'],
             'birthday'         => $request['birthday'],
             'hometown_city_id' => $request['hometown_city_id'],
             'address'          => $request['address'],

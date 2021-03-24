@@ -75,8 +75,7 @@ class CustomerService extends BaseService
             $dataCreate = [
                 'client_id'        => $this->getCurrentUser('client_id'),
                 'type_id'            => CUSTOMER_NORMAL,
-                'first_name'       => $request['first_name'],
-                'last_name'        => $request['last_name'],
+                'name'        => $request['name'],
                 'birthday'         => $request['birthday'],
                 'hometown_city_id' => $request['hometown_city_id'],
                 'address'          => $request['address'],
@@ -112,8 +111,7 @@ class CustomerService extends BaseService
         try {
             $dataUpdate = [
                 'client_id'        => $this->getCurrentUser('client_id'),
-                'first_name'       => $request['first_name'],
-                'last_name'        => $request['last_name'],
+                'name'        => $request['name'],
                 'birthday'         => $request['birthday'],
                 'hometown_city_id' => $request['hometown_city_id'],
                 'address'          => $request['address'],

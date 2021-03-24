@@ -40,7 +40,8 @@ class ProductRepository extends BaseRepository
 
         $query = $this->model
             ->select('*')
-            ->where('is_active', STATUS_ACTIVE);
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE);
 
         if (in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
             $query = $query->where('id', $user->brand_id);
@@ -80,20 +81,23 @@ class ProductRepository extends BaseRepository
             $roles[] = $role->role_id;
         }
 
-        if (!isset($params['supplier_id']) && in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles)) {
+        if (!isset($params['supplier_id']) && (in_array(ROLE_MANAGER, $roles) || in_array(ROLE_BRAND_MANAGER, $roles) || in_array(ROLE_EMPLOYEE, $roles))) {
             $query = $query->where(Product::getCol('client_id'), $user->client_id);
         } else {
             $query = $query->where(Product::getCol('supplier_id'), $params['supplier_id']);
         }
 
         if (isset($params['category_id'])) {
-            $query = $query->where('category_id', $params['category_id']);
+            $query = $query->where(Product::getCol('category_id'), $params['category_id']);
         }
 
         if (isset($params['start_price']) && isset($params['end_price'])) {
             $query = $query->where(Product::getCol('price'), ">=", $params['start_price']);
             $query = $query->where(Product::getCol('price'), "<=", $params['end_price']);
         }
+
+        $query = $query->where(Product::getCol('is_active'), STATUS_ACTIVE);
+        $query = $query->where(Product::getCol('is_delete'), STATUS_INACTIVE);
 
         $query = $query->orderBy($order, $sort)
             ->paginate($length);
@@ -109,6 +113,15 @@ class ProductRepository extends BaseRepository
                 Product::getCol('code'),
                 Product::getCol('name'),
                 Product::getCol('image'),
+                Product::getCol('image1'),
+                Product::getCol('image2'),
+                Product::getCol('image3'),
+                Product::getCol('image4'),
+                Product::getCol('video'),
+                Product::getCol('video1'),
+                Product::getCol('video2'),
+                Product::getCol('video3'),
+                Product::getCol('video4'),
                 Product::getCol('price'),
                 Product::getCol('category_id'),
                 Product::getCol('description'),

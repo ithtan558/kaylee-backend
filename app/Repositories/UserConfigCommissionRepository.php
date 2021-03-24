@@ -17,6 +17,7 @@ class UserConfigCommissionRepository extends BaseRepository
         $result = $this->model
             ->select('commission_product', 'commission_service', )
             ->where('is_active', STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
             ->where('user_id', $user_id)
             ->first();
 

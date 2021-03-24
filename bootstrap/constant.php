@@ -111,17 +111,19 @@ define('ERRORS', [
     'supplier_id'                           => 100026,
     'cart_supplier_information.address'     => 100027,
     'cart_supplier_information.wards_id'    => 100028,
+    'cart_customer.name'                    => 100029,
 ]);
 
 /*
  | define path for image
 ----------------------------------------------------------------------------
 */
-define('URL_IMAGE_SUPPLIER', "http://cms.kaylee.vn");
-define('PATH_IMAGE_SUPPLIER', URL_IMAGE_SUPPLIER . '/upload/');
+define('URL_IMAGE_CMS', "http://cms.kaylee.vn");
+define('PATH_IMAGE_SUPPLIER', URL_IMAGE_CMS . '/upload/');
+define('PATH_IMAGE_ADS', URL_IMAGE_CMS . '/upload/ads/');
 
-//define('URL', "http://" . $_SERVER['SERVER_NAME']);
-//define('PATH_IMAGE', URL . '/upload/images/');
+define('URL', "http://" . $_SERVER['SERVER_NAME']);
+define('PATH_IMAGE', URL . '/upload/images/');
 
 /*
  | define status for reservation
@@ -144,3 +146,15 @@ define('NOTIFICATION_READ', 2);
 ----------------------------------------------------------------------------
 */
 define('NUMBER_PREFIXES', ['0812', '0813', '0814', '0815', '0816', '0817', '0818', '0819', '0909', '0908']);
+
+// Define TYPE for OTP
+define('TYPE_OTP_REGISTER', 1);
+define('TYPE_OTP_FORGOT', 2);
+
+// Define link OTP
+define('LINK_OTP', 'https://cloudsms.vietguys.biz:4438/api/index.php');
+define('USERNAME', 'kaylee');
+define('PASSWORD', '3j2sv');
+define('FROM', 'KAYLEE');
+define('TYPE', 8);
+define('JSON', 1);
