@@ -22,7 +22,7 @@ class CityController extends Controller
     {
         $data = $this->cityService->getAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

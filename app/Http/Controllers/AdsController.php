@@ -22,7 +22,7 @@ class AdsController extends Controller
     {
         $data = $this->adsService->getAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

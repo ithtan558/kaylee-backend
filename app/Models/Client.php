@@ -18,6 +18,9 @@ class Client extends BaseModel
             'city_id',
             'district_id',
             'wards_id',
+            'is_unblock',
+            'date_click_warning',
+            'date_expired',
             'is_active',
             'is_delete',
             'created_at'

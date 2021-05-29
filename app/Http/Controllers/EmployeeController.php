@@ -24,28 +24,28 @@ class EmployeeController extends Controller
     {
         $data = $this->employeeService->getAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getList()
     {
         $data = $this->employeeService->getList($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getByPhoneOrName()
     {
         $data = $this->employeeService->getByPhoneOrName($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetail($id)
     {
         $result = $this->employeeService->getDetail($id);
 
-        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
+        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY], $this->request);
     }
 
     public function create()
@@ -54,7 +54,7 @@ class EmployeeController extends Controller
 
         $data = $this->employeeService->create($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function update()
@@ -64,14 +64,14 @@ class EmployeeController extends Controller
 
         $data = $this->employeeService->update($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function delete($id)
     {
         $data = $this->employeeService->delete($id);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

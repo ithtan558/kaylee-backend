@@ -24,4 +24,15 @@ class VersionRepository extends BaseRepository
         return $query;
     }
 
+    public function checkVersion($version_code)
+    {
+        $query = $this->model
+            ->select(["name", "code", "description", "force"])
+            ->where("is_active", STATUS_ACTIVE)
+            ->where('is_delete', STATUS_INACTIVE)
+            ->where('code', '>',  $version_code)
+            ->first();
+        return $query;
+    }
+
 }

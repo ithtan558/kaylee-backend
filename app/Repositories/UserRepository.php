@@ -167,4 +167,16 @@ class UserRepository extends BaseRepository
         return $result;
     }
 
+    public function getAllUnBlock()
+    {
+        $result = $this->model
+            ->select('*')
+            ->where('is_delete', STATUS_INACTIVE)
+            ->where('is_active', STATUS_ACTIVE)
+            ->orderBy('id', 'DESC')
+            ->get();
+
+        return $result;
+    }
+
 }

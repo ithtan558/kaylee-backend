@@ -89,7 +89,6 @@ class CommissionService extends BaseService
 
         $user_config_commission = $this->userConfigCommissionRep->findByAUserId(['user_id' => $request['user_id']]);
         if ($commission_product) {
-            dd($data['items']);
             foreach ($data['items'] as $index => &$item) {
                 $item->commission_product = 0;
                 foreach ($item->order_details as $order_detail) {

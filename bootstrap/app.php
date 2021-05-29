@@ -66,9 +66,16 @@ $app->singleton(
  ]);
 
 $app->routeMiddleware([
-    'jwt.auth'=> App\Middleware\JwtAuthMiddleware::class,
+    'jwt.auth'=> App\Http\Middleware\JwtAuthMiddleware::class,
 ]);
 
+$app->routeMiddleware([
+    'expired.account'=> App\Http\Middleware\ExpriedAccountRequest::class,
+]);
+
+$app->routeMiddleware([
+    'version.verify'=> App\Http\Middleware\VersionRequest::class,
+]);
 
 $app->configure('database');
 $app->configure('auth');

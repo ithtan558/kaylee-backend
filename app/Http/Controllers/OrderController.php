@@ -27,28 +27,28 @@ class OrderController extends Controller
     {
         $data = $this->orderService->getAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getCount()
     {
         $data = $this->orderService->getCount();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getList()
     {
         $data = $this->orderService->getList($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetail($id)
     {
         $result = $this->orderService->getDetail($id);
 
-        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
+        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY], $this->request);
     }
 
     public function create()
@@ -56,7 +56,7 @@ class OrderController extends Controller
         $this->validate($this->request, OrderCreateValidator::rules(), OrderCreateValidator::messages());
         $data = $this->orderService->create($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function update()
@@ -64,7 +64,7 @@ class OrderController extends Controller
         $this->validate($this->request, OrderUpdateValidator::rules(), OrderUpdateValidator::messages());
         $data = $this->orderService->update($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function createSupplier()
@@ -72,7 +72,7 @@ class OrderController extends Controller
         $this->validate($this->request, SupplierOrderCreateValidator::rules(), SupplierOrderCreateValidator::messages());
         $data = $this->orderService->createSupplier($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function updateSupplier()
@@ -80,7 +80,7 @@ class OrderController extends Controller
         $this->validate($this->request, SupplierOrderUpdateValidator::rules(), SupplierOrderUpdateValidator::messages());
         $data = $this->orderService->updateSupplier($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function updateStatus()
@@ -88,6 +88,6 @@ class OrderController extends Controller
         $this->validate($this->request, OrderUpdateStatusValidator::rules(), OrderUpdateStatusValidator::messages());
         $data = $this->orderService->updateStatus($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 }

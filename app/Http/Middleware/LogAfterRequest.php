@@ -12,6 +12,7 @@ class LogAfterRequest
         $log           = new \App\Models\Log();
         $log->ip       = $ip;
         $log->url      = $url;
+        $log->header = json_encode($request->header());
         $log->request  = json_encode($request->all());
         $log->save();
         return $next($request);
@@ -24,6 +25,7 @@ class LogAfterRequest
         $log           = new \App\Models\Log();
         $log->ip       = $ip;
         $log->url      = $url;
+        $log->header = json_encode($request->header());
         $log->request  = json_encode($request->all());
         $log->response = $response;
         $log->save();

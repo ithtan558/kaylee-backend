@@ -27,42 +27,42 @@ class NotificationController extends Controller
     {
         $data = $this->notificationService->getList($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetail($id)
     {
         $result = $this->notificationService->getDetail($id);
 
-        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
+        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY], $this->request);
     }
 
     public function delete($id)
     {
         $data = $this->notificationService->delete($id);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function updateStatus()
     {
         $data = $this->notificationService->updateStatus($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function deleteAll()
     {
         $data = $this->notificationService->deleteAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getCount()
     {
         $data = $this->notificationService->getCount();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

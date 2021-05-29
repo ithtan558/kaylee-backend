@@ -24,7 +24,7 @@ class ReportController extends Controller
         $this->validate($this->request, ReportValidator::rules(), ReportValidator::messages());
         $data = $this->reportService->getTotal($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getTotalByEmployeeAndDate()
@@ -32,7 +32,7 @@ class ReportController extends Controller
         $this->validate($this->request, ReportValidator::rules(), ReportValidator::messages());
         $data = $this->reportService->getTotalByEmployeeAndDate($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getTotalByServiceAndDate()
@@ -40,7 +40,15 @@ class ReportController extends Controller
         $this->validate($this->request, ReportValidator::rules(), ReportValidator::messages());
         $data = $this->reportService->getTotalByServiceAndDate($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
+    }
+
+    public function getTotalByProductAndDate()
+    {
+        $this->validate($this->request, ReportValidator::rules(), ReportValidator::messages());
+        $data = $this->reportService->getTotalByProductAndDate($this->request);
+
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

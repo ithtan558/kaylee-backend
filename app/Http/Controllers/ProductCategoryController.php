@@ -24,21 +24,21 @@ class ProductCategoryController extends Controller
     {
         $data = $this->productCategory->getAll($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getList()
     {
         $data = $this->productCategory->getList($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetail($id)
     {
         $result = $this->productCategory->getDetail($id);
 
-        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
+        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY], $this->request);
     }
 
     public function create()
@@ -47,7 +47,7 @@ class ProductCategoryController extends Controller
 
         $data = $this->productCategory->create($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function update()
@@ -56,14 +56,14 @@ class ProductCategoryController extends Controller
 
         $data = $this->productCategory->update($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function delete($id)
     {
         $data = $this->productCategory->delete($id);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

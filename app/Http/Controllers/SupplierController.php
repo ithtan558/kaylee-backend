@@ -22,14 +22,14 @@ class SupplierController extends Controller
     {
         $data = $this->supplierService->getList($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetail($id)
     {
         $result = $this->supplierService->getDetail($id);
 
-        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY]);
+        return Api::response($result[RESPONSE_KEY], $result[STT_CODE_KEY], $this->request);
     }
 
 }

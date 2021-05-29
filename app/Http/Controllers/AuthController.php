@@ -35,7 +35,7 @@ class AuthController extends Controller
     {
         $data = $this->authService->logout();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function verifyPhoneAndSendOtp()
@@ -74,7 +74,7 @@ class AuthController extends Controller
     {
         $data = $this->authService->getAuthenticatedUser();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function register()
@@ -88,6 +88,18 @@ class AuthController extends Controller
     {
         $this->validate($this->request, UpdateValidator::rules(), UpdateValidator::messages());
         $data = $this->authService->update($this->request);
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
+    }
+
+    public function checkExpired()
+    {
+        $data = $this->authService->checkExpired($this->request);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
+    }
+
+    public function clickWarning()
+    {
+        $data = $this->authService->clickWarning($this->request);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 }

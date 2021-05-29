@@ -22,7 +22,7 @@ class CustomerTypeController extends Controller
     {
         $data = $this->customerTypeService->getAll();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

@@ -15,6 +15,7 @@ use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use App\Libraries\Api;
 use App\Helpers\CommonHelper;
 use Illuminate\Http\Response;
+use stdClass;
 
 class Handler extends ExceptionHandler
 {
@@ -68,19 +69,30 @@ class Handler extends ExceptionHandler
         }
 
         if ($e instanceof NotFoundHttpException) {
+
             return Api::response(['message' => 'Trang không tìm thấy'], Response::HTTP_NOT_FOUND);
         }
 
         if ($e instanceof HttpException) {
-            return Api::response(['message' => $e->getMessage()], $e->getStatusCode());
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Không tìm thấy tài khoản';
+            return Api::response(['message' => $e->getMessage(), 'errors' => $errors], $e->getStatusCode());
         }
 
         if ($e instanceof QueryException) {
-            return Api::response(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Không tìm thấy tài khoản1';
+            return Api::response(['message' => $e->getMessage(), 'errors' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if ($e instanceof ErrorException) {
-            return Api::response(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Không tìm thấy tài khoản2';
+            return Api::response(['message' => $e->getMessage(), 'errors' => $errors], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
 

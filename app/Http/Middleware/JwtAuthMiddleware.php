@@ -6,7 +6,7 @@
  * Time: 4:44 PM
  */
 
-namespace App\Middleware;
+namespace App\Http\Middleware;
 
 use App\Libraries\Api;
 use Closure;

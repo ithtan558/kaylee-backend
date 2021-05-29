@@ -22,7 +22,7 @@ class VersionController extends Controller
     {
         $data = $this->versionService->getDetail();
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

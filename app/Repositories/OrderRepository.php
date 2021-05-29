@@ -56,7 +56,7 @@ class OrderRepository extends BaseRepository
             $query = $query->where('supplier_id', '>',  0);
         }
         if (isset($params['is_history'])) {
-            $query = $query->whereIn('order_status_id', [ORDER_STATUS_FINISHED, ORDER_STATUS_CANCEL]);
+            $query = $query->whereIn('order_status_id', [ORDER_STATUS_FINISHED, ORDER_STATUS_REFUND_SALON]);
         }
 
         // Filter base on roles of user
@@ -201,7 +201,7 @@ class OrderRepository extends BaseRepository
 
         $query = $this->model
             ->select(
-                DB::raw('SUM(' . OrderDetail::getCol('price') . ') as price'),
+                DB::raw('SUM(' . OrderDetail::getCol('total') . ') as total'),
                 DB::raw('SUM(' . OrderDetail::getCol('quantity') . ') as quantity'),
                 Service::getCol('name')
             )
@@ -225,7 +225,50 @@ class OrderRepository extends BaseRepository
             ->groupBy(OrderDetail::getCol('service_id'))->get();
 
         foreach ($result as &$item) {
-            $item->amount = $item->price * $item->quantity;
+            $item->amount = $item->total;
+        }
+
+        return $result;
+
+    }
+
+    public function getTotalByProductAndDate($params)
+    {
+        // Filter base on roles of user
+        $user  = CommonHelper::getAuth();
+        $roles = [];
+        foreach ($user->user_roles as $role) {
+            $roles[] = $role->role_id;
+        }
+
+        $query = $this->model
+            ->select(
+                DB::raw('SUM(' . OrderDetail::getCol('total') . ') as total'),
+                DB::raw('SUM(' . OrderDetail::getCol('quantity') . ') as quantity'),
+                Product::getCol('name')
+            )
+            ->from(OrderDetail::getTbl())
+            ->join(Order::getTbl(), Order::getCol("id"), "=", OrderDetail::getCol("order_id"))
+            ->join(Product::getTbl(), Product::getCol("id"), "=", OrderDetail::getCol("product_id"));
+
+        if (in_array(ROLE_MANAGER, $roles)) {
+            $query = $query->where(Order::getCol('client_id'), $user->client_id);
+        }
+        if (isset($params['brand_id']) && $params['brand_id']) {
+            $query = $query->where(Order::getCol('brand_id'), $params['brand_id']);
+        }
+
+        $query->whereRaw('date(' . Order::getCol('created_at') . ') between "' . $params['start_date'] . '" and "' . $params['end_date'] . '"');
+
+        $query->where(Order::getCol('is_delete'), STATUS_INACTIVE);
+        $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
+        $query->where(Order::getCol('supplier_id'), STATUS_INACTIVE);
+
+        $result = $query->orderBy(Order::getCol('id'), 'DESC')
+            ->groupBy(OrderDetail::getCol('product_id'))->get();
+
+        foreach ($result as &$item) {
+            $item->amount = $item->total;
         }
 
         return $result;
@@ -313,6 +356,7 @@ class OrderRepository extends BaseRepository
 
         $query->where('is_delete', STATUS_INACTIVE);
         $query->where('is_active', STATUS_ACTIVE);
+        $query->where('supplier_id', STATUS_INACTIVE);
 
         $result = $query->orderBy('id', 'DESC')->get();
 

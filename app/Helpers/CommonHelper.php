@@ -101,7 +101,7 @@ class CommonHelper
         return $codeExisting;
     }
 
-    public static function uploadImage($request)
+    public static function uploadImage($request, $width = 300, $height = 300)
     {
         $filename = '';
         if ($request->hasFile('image')) {
@@ -110,7 +110,9 @@ class CommonHelper
             $filename     = Str::slug(str_replace($ext, microtime(), $request->image->getClientOriginalName())).$ext;
             $image_resize = Image::make($image->getRealPath());
             $image_resize->orientate();
-            //$image_resize->resize(100, 100);
+            $image_resize->resize($width, $height, function ($s) {
+                $s->aspectRatio();
+            });
             $image_resize->save(public_path(DIR_UPLOAD . $filename));
         }
         return $filename;
@@ -162,6 +164,29 @@ class CommonHelper
 
     public static function fullAddress($city, $district, $wards, $location) {
         return $location .', '. $wards .' - '. $district .' - '. $city;
+    }
+
+    public static function secondsToWords($seconds)
+    {
+        /*** get the days ***/
+        $days = intval(intval($seconds) / (3600*24));
+    }
+
+    /**
+     * @param Validator $validator
+     *
+     * @return null|string
+     */
+    public static function removeInformationForDefaultAccount(&$data = [], $client_id, $brand_id = false)
+    {
+        unset($data['id']);
+        $data['client_id'] = $client_id;
+        if ($brand_id) {
+            $data['brand_id'] = $brand_id;
+        }
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        return $data;
     }
 
 }

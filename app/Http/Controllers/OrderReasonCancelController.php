@@ -22,7 +22,7 @@ class OrderReasonCancelController extends Controller
     {
         $data = $this->orderReasonCancelService->getAll($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

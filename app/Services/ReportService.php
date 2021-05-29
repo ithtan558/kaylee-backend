@@ -52,4 +52,12 @@ class ReportService extends BaseService
         return $this->getResponseData();
     }
 
+    public function getTotalByProductAndDate(Request $request)
+    {
+        $data = $this->orderRep->getTotalByProductAndDate($request->all());
+        $this->setData($data);
+
+        return $this->getResponseData();
+    }
+
 }

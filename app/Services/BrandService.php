@@ -74,7 +74,7 @@ class BrandService extends BaseService
                 'created_by'  => $this->getCurrentUser('id')
             ];
 
-            $name                = CommonHelper::uploadImage($request);
+            $name                = CommonHelper::uploadImage($request, 460, 460);
             $dataCreate['image'] = $name;
 
             $this->brandRep->create($dataCreate);
@@ -109,7 +109,7 @@ class BrandService extends BaseService
             ];
 
             if ($request->hasFile('image')) {
-                $name                = CommonHelper::uploadImage($request);
+                $name                = CommonHelper::uploadImage($request, 460, 460);
                 $dataUpdate['image'] = $name;
             }
 

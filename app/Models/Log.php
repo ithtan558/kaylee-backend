@@ -10,6 +10,7 @@ class Log extends BaseModel
         = [
             'ip',
             'url',
+            'header',
             'request',
             'response',
             'created_at'

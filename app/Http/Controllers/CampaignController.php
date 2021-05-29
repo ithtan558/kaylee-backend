@@ -21,7 +21,7 @@ class CampaignController extends Controller
     public function getAll()
     {
         $data = $this->campaignService->getAll();
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

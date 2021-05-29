@@ -28,7 +28,7 @@ class CommissionController extends Controller
         $this->validate($this->request, CommissionDetailValidator::rules(), CommissionDetailValidator::messages());
         $data = $this->commissionService->detail($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getListProduct()
@@ -36,7 +36,7 @@ class CommissionController extends Controller
         $this->validate($this->request, CommissionProductListOrderValidator::rules(), CommissionProductListOrderValidator::messages());
         $data = $this->commissionService->getList($this->request, true);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getListService()
@@ -44,7 +44,7 @@ class CommissionController extends Controller
         $this->validate($this->request, CommissionProductListOrderValidator::rules(), CommissionProductListOrderValidator::messages());
         $data = $this->commissionService->getList($this->request, false, true);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function getDetailSetting()
@@ -52,7 +52,7 @@ class CommissionController extends Controller
         $this->validate($this->request, CommissionSettingValidator::rules(), CommissionSettingValidator::messages());
         $data = $this->commissionService->getDetailSetting($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
     public function updateSetting()
@@ -60,7 +60,7 @@ class CommissionController extends Controller
         $this->validate($this->request, CommissionUpdateSettingValidator::rules(), CommissionUpdateSettingValidator::messages());
         $data = $this->commissionService->updateSetting($this->request);
 
-        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY]);
+        return Api::response($data[RESPONSE_KEY], $data[STT_CODE_KEY], $this->request);
     }
 
 }

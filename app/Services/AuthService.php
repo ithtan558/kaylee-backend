@@ -14,6 +14,12 @@ use App\Repositories\DistrictRepository;
 use App\Repositories\WardsRepository;
 use App\Repositories\UserDeviceRepository;
 use App\Repositories\AdminUsersRepository;
+use App\Repositories\ProductCategoryRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\ServiceCategoryRepository;
+use App\Repositories\ServiceRepository;
+use App\Repositories\BrandProductRepository;
+use App\Repositories\BrandServiceRepository;
 use Illuminate\Http\Response;
 use stdClass;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -21,6 +27,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Illuminate\Http\Request;
+use App\Jobs\SendOtp;
 
 class AuthService extends BaseService
 {
@@ -34,6 +41,12 @@ class AuthService extends BaseService
     protected $wardsRep;
     protected $userDeviceRep;
     protected $adminUsersRep;
+    protected $productCategoryRep;
+    protected $productRep;
+    protected $serviceCategoryRep;
+    protected $serviceRep;
+    protected $brandProductRep;
+    protected $brandServiceRep;
 
     public function __construct(
         UserRepository $userRep,
@@ -45,7 +58,13 @@ class AuthService extends BaseService
         DistrictRepository $districtRep,
         WardsRepository $wardsRep,
         UserDeviceRepository $userDeviceRep,
-        AdminUsersRepository $adminUsersRep
+        AdminUsersRepository $adminUsersRep,
+        ProductCategoryRepository $productCategoryRep,
+        ProductRepository $productRep,
+        ServiceCategoryRepository $serviceCategoryRep,
+        ServiceRepository $serviceRep,
+        BrandProductRepository $brandProductRep,
+        BrandServiceRepository $brandServiceRep
     )
     {
         $this->userRep       = $userRep;
@@ -58,6 +77,12 @@ class AuthService extends BaseService
         $this->wardsRep      = $wardsRep;
         $this->userDeviceRep = $userDeviceRep;
         $this->adminUsersRep = $adminUsersRep;
+        $this->productCategoryRep = $productCategoryRep;
+        $this->productRep = $productRep;
+        $this->serviceCategoryRep = $serviceCategoryRep;
+        $this->serviceRep = $serviceRep;
+        $this->brandProductRep = $brandProductRep;
+        $this->brandServiceRep = $brandServiceRep;
     }
 
     public function login(Request $request)
@@ -147,13 +172,19 @@ class AuthService extends BaseService
             ];
             $this->otpRep->update($dataUpdateOtp, $otp->id);
         }
+
+        $otp           = CommonHelper::createRandomOtp(4);
         $dataCreateOtp = [
-            'otp'       => DEFAULT_NUMBER_OTP,
+            'otp'       => $otp,
             'type'      => TYPE_OTP_FORGOT,
             'user_id'   => $user->id,
             'is_verify' => STATUS_INACTIVE
         ];
         $this->otpRep->create($dataCreateOtp);
+
+        // Put order to queue also
+        $job = (new SendOtp($otp, $request['phone']))->onQueue('send_otp');
+        dispatch($job);
 
         $msg          = new stdClass();
         $msg->title   = 'Thành công';
@@ -289,14 +320,30 @@ class AuthService extends BaseService
         $user = '';
         try {
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                abort(Response::HTTP_UNAUTHORIZED, 'Không tìm thấy User');
+                $errors          = new stdClass();
+                $errors->title   = 'Đăng nhập thất bại';
+                $errors->message = 'Không tìm thấy tài khoản';
+                $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);
+                return $this->getResponseData();
             }
         } catch (TokenExpiredException $ex) {
-            abort(Response::HTTP_UNAUTHORIZED, 'Token expired');
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Phiên đăng nhập hết hạn';
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);
+            return $this->getResponseData();
         } catch (TokenInvalidException $ex) {
-            abort(Response::HTTP_UNAUTHORIZED, 'Token is invalid');
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Phiên đăng nhập không tìm thấy';
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);
+            return $this->getResponseData();
         } catch (JWTException $ex) {
-            abort(Response::HTTP_UNAUTHORIZED, $ex->getMessage());
+            $errors          = new stdClass();
+            $errors->title   = 'Đăng nhập thất bại';
+            $errors->message = 'Không tìm thấy tài khoản';
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);
+            return $this->getResponseData();
         }
 
         // Get roles
@@ -335,7 +382,8 @@ class AuthService extends BaseService
         $dataCreateClient = [
             'name'      => $request['name'],
             'phone'     => $request['phone'],
-            'is_active' => STATUS_INACTIVE
+            'is_active' => STATUS_INACTIVE,
+            'created_at' => date('Y-m-d H:i:s')
         ];
         // Check and get admin_user_id
         if (!empty($request['code'])) {
@@ -386,18 +434,10 @@ class AuthService extends BaseService
             'phone'     => $request['phone']
         ];
         $this->otpRep->create($dataCreateOtp);
-        // Send otp
-        $dataOtp = [
-            'u'     => USERNAME,
-            'pwd'   => PASSWORD,
-            'from'  => FROM,
-            'phone' => $request['phone'],
-            'sms'   => 'KAYLEE-Ma OTP cua ban la ' . $otp . '. Vui long nhap ma de tiep tuc',
-            'bid'   => CommonHelper::createRandomCode(),
-            'type'  => TYPE,
-            'json'  => JSON,
-        ];
-        Curl::callApi(LINK_OTP, $dataOtp);
+
+        // Put order to queue also
+        $job = (new SendOtp($otp, $request['phone']))->onQueue('send_otp');
+        dispatch($job);
 
         $msg          = new stdClass();
         $msg->title   = 'Thành công';
@@ -407,6 +447,121 @@ class AuthService extends BaseService
             'user_id' => $user->id
         ]);
 
+        // Create default data and base on client default
+        $user = $this->userRep->findByAttributes(['phone' => CLIENT_DEFAULT, 'is_delete' => 0, 'is_active' => 1]);
+        if (count($user) > 0) {
+            $product_category = $this->productCategoryRep->findByAttributes(['client_id' => $user[0]->client_id]);
+            $product_category_ids = $product_category->pluck('id');
+            $product_category = $product_category->toArray();
+            $product = $this->productRep->getByCaterogyIds($product_category_ids, $user[0]->client_id)->toArray();
+
+            $service_category = $this->serviceCategoryRep->findByAttributes(['client_id' => $user[0]->client_id]);
+            $service_category_ids = $service_category->pluck('id');
+            $service_category = $service_category->toArray();
+            $service = $this->serviceRep->getByCaterogyIds($service_category_ids, $user[0]->client_id)->toArray();
+
+            $user = $this->userRep->findByAttributes(['client_id' => $user[0]->client_id])->toArray();;
+            unset($user[0]);
+
+            // Product category
+            foreach ($product_category as $item) {
+                $old_id = $item['id'];
+                CommonHelper::removeInformationForDefaultAccount($item, $client->id);
+                $category = $this->productCategoryRep->create($item);
+                foreach ($product as &$item_product) {
+                    if ($item_product['category_id'] === $old_id) {
+                        $item_product['category_id'] = $category->id;
+                    }
+                }
+            }
+
+            // Product
+            $product_insert = [];
+            foreach ($product as $item_product) {
+                CommonHelper::removeInformationForDefaultAccount($item_product, $client->id);
+                $product_insert[] = $item_product;
+            }
+            $this->productRep->insertMultiple($product_insert);
+
+            // Brand Product
+            $product_after_insert = $this->productRep->findByAttributes(['client_id' => $client->id]);
+            $brand_product_insert = [];
+            foreach ($product_after_insert as $item) {
+                $tmp = [
+                    'client_id' => $client->id,
+                    'brand_id' => $brand->id,
+                    'product_id' => $item->id,
+                    'is_active' => STATUS_ACTIVE,
+                    'is_delete' => STATUS_INACTIVE,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                $brand_product_insert[] = $tmp;
+            }
+            $this->brandProductRep->insertMultiple($brand_product_insert);
+
+            // Service Category
+            foreach ($service_category as $item) {
+                $old_id = $item['id'];
+                CommonHelper::removeInformationForDefaultAccount($item, $client->id);
+                $category = $this->serviceCategoryRep->create($item);
+                foreach ($service as &$item_service) {
+                    if ($item_service['category_id'] === $old_id) {
+                        $item_service['category_id'] = $category->id;
+                    }
+                }
+            }
+
+            // Service
+            $service_insert = [];
+            foreach ($service as $item) {
+                CommonHelper::removeInformationForDefaultAccount($item, $client->id);
+                $service_insert[] = $item;
+            }
+            $this->serviceRep->insertMultiple($service_insert);
+
+            // Brand Service
+            $service_after_insert = $this->serviceRep->findByAttributes(['client_id' => $client->id]);
+            $brand_service_insert = [];
+            foreach ($service_after_insert as $item) {
+                $tmp = [
+                    'client_id' => $client->id,
+                    'brand_id' => $brand->id,
+                    'service_id' => $item->id,
+                    'is_active' => STATUS_ACTIVE,
+                    'is_delete' => STATUS_INACTIVE,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                $brand_service_insert[] = $tmp;
+            }
+            $this->brandServiceRep->insertMultiple($brand_service_insert);
+
+            // User
+            $user_insert = [];
+            foreach ($user as $item) {
+                CommonHelper::removeInformationForDefaultAccount($item, $client->id, $brand->id);
+                $user_insert[] = $item;
+            }
+            $this->userRep->insertMultiple($user_insert);
+            // User Role
+            $user_after_insert = $this->userRep->findByAttributes(['client_id' => $client->id]);
+            unset($user_after_insert[0]);
+            $user_role_insert = [];
+            foreach ($user_after_insert as $item) {
+                $tmp = [
+                    'user_id' => $item->id,
+                    'role_id' => ROLE_EMPLOYEE,
+                    'is_active' => STATUS_ACTIVE,
+                    'is_delete' => STATUS_INACTIVE,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ];
+                $user_role_insert[] = $tmp;
+            }
+            $this->userRoleRep->insertMultiple($user_role_insert);
+
+        }
         return $this->getResponseData();
 
     }
@@ -437,6 +592,61 @@ class AuthService extends BaseService
         } else {
             $errors          = new stdClass();
             $errors->title   = 'Chứng thực thất bại';
+            $errors->message = 'Token không khả dụng.';
+
+            $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->getResponseData();
+
+    }
+
+    public function checkExpired(Request $request)
+    {
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $client = $this->clientRep->find($user->client_id);
+        // Check correct account
+        if (!empty($client)) {
+            if (!$client->is_unblock) {
+                $now = time();
+                $diff = $now - strtotime($client->created_at);
+                $day = intval($diff / (3600 * 24));
+                if ($day > 30) {
+                    $obj = new stdClass();
+                    $obj->code = ERRORS['expired_account'];
+                    $obj->message = 'Tài khoản của bạn đã bị vô hiệu hoá. Xin vui lòng truy cập lại sau';
+                    $this->setMessageDataStatusCode(null, ['errors' => $obj], Response::HTTP_UNAUTHORIZED);
+                    return $this->getResponseData();
+                }
+            }
+        }
+        $msg          = new stdClass();
+        $msg->title   = 'Thành công';
+        $msg->content = 'Tài khoản đã được kích hoạt';
+        $this->setMessage($msg);
+
+        return $this->getResponseData();
+
+    }
+
+    public function clickWarning(Request $request)
+    {
+
+        $user = JWTAuth::parseToken()->authenticate();
+        $client = $this->clientRep->find($user->client_id);
+        // Check correct account
+        if (!empty($client)) {
+            $dataUpdate['date_click_warning'] = date('Y-m-d H:i:s');
+            $this->clientRep->update($dataUpdate, $client->id);
+
+            $msg          = new stdClass();
+            $msg->title   = 'Thành công';
+            $msg->content = 'Cập nhật tài khoản thành công';
+            $this->setMessage($msg);
+        } else {
+            $errors          = new stdClass();
+            $errors->title   = 'Thất bại';
             $errors->message = 'Token không khả dụng.';
 
             $this->setMessageDataStatusCode(null, ['errors' => $errors], Response::HTTP_UNAUTHORIZED);

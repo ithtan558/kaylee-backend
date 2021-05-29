@@ -26,7 +26,6 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             'token_reset_password',
             'image',
             'name',
-            'name',
             'birthday',
             'phone',
             'address',

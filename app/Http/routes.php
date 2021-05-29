@@ -15,264 +15,281 @@ $app->get('/', function () use ($app) {
     return $app->version();
 });
 
-// Authentication user
-$app->get('/user-info', 'AuthController@getUserInfo');
-$app->get('/logout', 'AuthController@logout');
-$app->post('/forgot/verify-phone-and-send-otp', 'AuthController@verifyPhoneAndSendOtp');
-$app->post('/forgot/verify-otp', 'AuthController@verifyOtp');
-$app->post('/register/verify-otp', 'AuthController@verifyOtpForRegister');
-$app->post('/forgot/update-password', 'AuthController@updatePassword');
-$app->post('/login', 'AuthController@login');
-$app->post('/register', 'AuthController@register');
-$app->post('/update', 'AuthController@update');
-
-// Role
 $app->group([
-    'prefix'     => "/role",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'RoleController@getAll');
-});
+    'middleware' => ['version.verify']],
+    function () use ($app) {
+        // Brand
+        $app->group([
+            'prefix'     => "/brand",
+            'middleware' => ['version.verify', 'jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'BrandController@create');
+            $app->get('/all', 'BrandController@getAll');
+            $app->get('/{id}', 'BrandController@getDetail');
+            $app->post('/{id}', 'BrandController@update');
+            $app->get('/', 'BrandController@getList');
+            $app->delete('/delete/{id}', 'BrandController@delete');
+        });
 
-// City
-$app->group([
-    'prefix'     => "/city",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'CityController@getAll');
-});
+        // User advise
+        $app->post('/user-advise', 'UserAdviseController@create');
 
-// District
-$app->group([
-    'prefix'     => "/district",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'DistrictController@getAll');
-    $app->get('/list-by-city/{id}', 'DistrictController@getListByCity');
-});
+        // Authentication user
+        $app->group([
+            'middleware' => ['expired.account']
+        ], function () use ($app) {
+            $app->get('/user-info', 'AuthController@getUserInfo');
+        });
 
-// Wards
-$app->group([
-    'prefix'     => "/wards",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'WardsController@getAll');
-    $app->get('/list-by-district/{id}', 'WardsController@getListByDistrict');
-});
+        $app->get('/logout', 'AuthController@logout');
+        $app->post('/forgot/verify-phone-and-send-otp', 'AuthController@verifyPhoneAndSendOtp');
+        $app->post('/forgot/verify-otp', 'AuthController@verifyOtp');
+        $app->post('/register/verify-otp', 'AuthController@verifyOtpForRegister');
+        $app->post('/forgot/update-password', 'AuthController@updatePassword');
+        $app->post('/login', 'AuthController@login');
+        $app->post('/register', 'AuthController@register');
+        $app->post('/update', 'AuthController@update');
+        $app->post('/check-expired', 'AuthController@checkExpired');
+        $app->post('/click-warning', 'AuthController@clickWarning');
 
-// Brand
-$app->group([
-    'prefix'     => "/brand",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'BrandController@create');
-    $app->get('/all', 'BrandController@getAll');
-    $app->get('/{id}', 'BrandController@getDetail');
-    $app->post('/{id}', 'BrandController@update');
-    $app->get('/', 'BrandController@getList');
-    $app->delete('/delete/{id}', 'BrandController@delete');
-});
+        // Role
+        $app->group([
+            'prefix'     => "/role",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'RoleController@getAll');
+        });
 
-// Service category
-$app->group([
-    'prefix'     => "/service-category",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'ServiceCategoryController@create');
-    $app->get('/all', 'ServiceCategoryController@getAll');
-    $app->get('/{id}', 'ServiceCategoryController@getDetail');
-    $app->post('/{id}', 'ServiceCategoryController@update');
-    $app->get('/', 'ServiceCategoryController@getList');
-    $app->delete('/delete/{id}', 'ServiceCategoryController@delete');
-});
+        // City
+        $app->group([
+            'prefix'     => "/city",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'CityController@getAll');
+        });
 
-// Service
-$app->group([
-    'prefix'     => "/service",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'ServiceController@create');
-    $app->get('/all', 'ServiceController@getAll');
-    $app->get('/{id}', 'ServiceController@getDetail');
-    $app->post('/{id}', 'ServiceController@update');
-    $app->get('/', 'ServiceController@getList');
-    $app->delete('/delete/{id}', 'ServiceController@delete');
-});
+        // District
+        $app->group([
+            'prefix'     => "/district",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'DistrictController@getAll');
+            $app->get('/list-by-city/{id}', 'DistrictController@getListByCity');
+        });
 
-// Customer
-$app->group([
-    'prefix'     => "/customer",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'CustomerController@create');
-    $app->get('/all', 'CustomerController@getAll');
-    $app->get('/get-count', 'CustomerController@getCount');
-    $app->get('/get-by-phone-and-name', 'CustomerController@getByPhoneOrName');
-    $app->get('/{id}', 'CustomerController@getDetail');
-    $app->post('/{id}', 'CustomerController@update');
-    $app->get('/', 'CustomerController@getList');
-    $app->delete('/delete/{id}', 'CustomerController@delete');
-});
+        // Wards
+        $app->group([
+            'prefix'     => "/wards",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'WardsController@getAll');
+            $app->get('/list-by-district/{id}', 'WardsController@getListByDistrict');
+        });
 
-// Customer type
-$app->group([
-    'prefix'     => "/customer-type",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'CustomerTypeController@getAll');
-});
+        // Service category
+        $app->group([
+            'prefix'     => "/service-category",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'ServiceCategoryController@create');
+            $app->get('/all', 'ServiceCategoryController@getAll');
+            $app->get('/{id}', 'ServiceCategoryController@getDetail');
+            $app->post('/{id}', 'ServiceCategoryController@update');
+            $app->get('/', 'ServiceCategoryController@getList');
+            $app->delete('/delete/{id}', 'ServiceCategoryController@delete');
+        });
 
-// Order
-$app->group([
-    'prefix'     => "/order",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'OrderController@create');
-    $app->get('/reason-cancel', 'OrderReasonCancelController@getAll');
-    $app->get('/all', 'OrderController@getAll');
-    $app->get('/get-count', 'OrderController@getCount');
-    $app->get('/{id}', 'OrderController@getDetail');
-    $app->post('/{id}', 'OrderController@update');
-    $app->get('/', 'OrderController@getList');
-    $app->post('/update-status/{id}', 'OrderController@updateStatus');
-});
+        // Service
+        $app->group([
+            'prefix'     => "/service",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'ServiceController@create');
+            $app->get('/all', 'ServiceController@getAll');
+            $app->get('/{id}', 'ServiceController@getDetail');
+            $app->post('/{id}', 'ServiceController@update');
+            $app->get('/', 'ServiceController@getList');
+            $app->delete('/delete/{id}', 'ServiceController@delete');
+        });
 
-// Order Supplier
-$app->group([
-    'prefix'     => "/supplier/order",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'OrderController@createSupplier');
-    $app->post('/{id}', 'OrderController@updateSupplier');
-});
+        // Customer
+        $app->group([
+            'prefix'     => "/customer",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'CustomerController@create');
+            $app->get('/all', 'CustomerController@getAll');
+            $app->get('/get-count', 'CustomerController@getCount');
+            $app->get('/get-by-phone-and-name', 'CustomerController@getByPhoneOrName');
+            $app->get('/{id}', 'CustomerController@getDetail');
+            $app->post('/{id}', 'CustomerController@update');
+            $app->get('/', 'CustomerController@getList');
+            $app->delete('/delete/{id}', 'CustomerController@delete');
+        });
 
-// Employee
-$app->group([
-    'prefix'     => "/employee",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'EmployeeController@create');
-    $app->get('/all', 'EmployeeController@getAll');
-    $app->get('/get-by-phone-and-name', 'EmployeeController@getByPhoneOrName');
-    $app->get('/{id}', 'EmployeeController@getDetail');
-    $app->post('/{id}', 'EmployeeController@update');
-    $app->get('/', 'EmployeeController@getList');
-    $app->delete('/delete/{id}', 'EmployeeController@delete');
-});
+        // Customer type
+        $app->group([
+            'prefix'     => "/customer-type",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'CustomerTypeController@getAll');
+        });
 
-// Report
-$app->group([
-    'prefix'     => "/report",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/get-total', 'ReportController@getTotal');
-    $app->get('/get-total-by-employee-date', 'ReportController@getTotalByEmployeeAndDate');
-    $app->get('/get-total-by-service-date', 'ReportController@getTotalByServiceAndDate');
-});
+        // Order
+        $app->group([
+            'prefix'     => "/order",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'OrderController@create');
+            $app->get('/reason-cancel', 'OrderReasonCancelController@getAll');
+            $app->get('/all', 'OrderController@getAll');
+            $app->get('/get-count', 'OrderController@getCount');
+            $app->get('/{id}', 'OrderController@getDetail');
+            $app->post('/{id}', 'OrderController@update');
+            $app->get('/', 'OrderController@getList');
+            $app->post('/update-status/{id}', 'OrderController@updateStatus');
+        });
 
-// Content
-$app->group([
-    'prefix'    => "/content"
-], function () use ($app) {
-    $app->get('/{slug}', 'ContentController@getDetail');
-});
+        // Order Supplier
+        $app->group([
+            'prefix'     => "/supplier/order",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'OrderController@createSupplier');
+            $app->post('/{id}', 'OrderController@updateSupplier');
+        });
 
-// Supplier
-$app->group([
-    'prefix'     => "/supplier",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/', 'SupplierController@getList');
-    $app->get('/{id}', 'SupplierController@getDetail');
-});
+        // Employee
+        $app->group([
+            'prefix'     => "/employee",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'EmployeeController@create');
+            $app->get('/all', 'EmployeeController@getAll');
+            $app->get('/get-by-phone-and-name', 'EmployeeController@getByPhoneOrName');
+            $app->get('/{id}', 'EmployeeController@getDetail');
+            $app->post('/{id}', 'EmployeeController@update');
+            $app->get('/', 'EmployeeController@getList');
+            $app->delete('/delete/{id}', 'EmployeeController@delete');
+        });
 
-// Product category
-$app->group([
-    'prefix'     => "/product-category",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'ProductCategoryController@create');
-    $app->get('/all', 'ProductCategoryController@getAll');
-    $app->get('/{id}', 'ProductCategoryController@getDetail');
-    $app->post('/{id}', 'ProductCategoryController@update');
-    $app->get('/', 'ProductCategoryController@getList');
-    $app->delete('/delete/{id}', 'ProductCategoryController@delete');
-});
+        // Report
+        $app->group([
+            'prefix'     => "/report",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/get-total', 'ReportController@getTotal');
+            $app->get('/get-total-by-employee-date', 'ReportController@getTotalByEmployeeAndDate');
+            $app->get('/get-total-by-service-date', 'ReportController@getTotalByServiceAndDate');
+            $app->get('/get-total-by-product-date', 'ReportController@getTotalByProductAndDate');
+        });
 
-// Product
-$app->group([
-    'prefix'     => "/product",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'ProductController@create');
-    $app->get('/all', 'ProductController@getAll');
-    $app->get('/{id}', 'ProductController@getDetail');
-    $app->post('/{id}', 'ProductController@update');
-    $app->get('/', 'ProductController@getList');
-    $app->delete('/delete/{id}', 'ProductController@delete');
-});
+        // Content
+        $app->group([
+            'prefix'    => "/content"
+        ], function () use ($app) {
+            $app->get('/{slug}', 'ContentController@getDetail');
+        });
 
-// Notification
-$app->group([
-    'prefix'     => "/notification",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/count-not-read', 'NotificationController@getCount');
-    $app->post('/update-status', 'NotificationController@updateStatus');
-    $app->get('/test', 'NotificationController@testNotificati1on');
-    $app->get('/test-topic', 'NotificationController@testTopic');
-    $app->get('/', 'NotificationController@getList');
-    $app->get('/{id}', 'NotificationController@getDetail');
-    $app->delete('/delete/all', 'NotificationController@deleteAll');
-    $app->delete('/delete/{id}', 'NotificationController@delete');
-});
+        // Supplier
+        $app->group([
+            'prefix'     => "/supplier",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/', 'SupplierController@getList');
+            $app->get('/{id}', 'SupplierController@getDetail');
+        });
 
-// Commission
-$app->group([
-    'prefix'     => "/commission",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/detail', 'CommissionController@detail');
-    $app->get('/product/list-order', 'CommissionController@getListProduct');
-    $app->get('/service/list-order', 'CommissionController@getListService');
-    $app->get('/setting', 'CommissionController@getDetailSetting');
-    $app->post('/setting/update', 'CommissionController@updateSetting');
-});
+        // Product category
+        $app->group([
+            'prefix'     => "/product-category",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'ProductCategoryController@create');
+            $app->get('/all', 'ProductCategoryController@getAll');
+            $app->get('/{id}', 'ProductCategoryController@getDetail');
+            $app->post('/{id}', 'ProductCategoryController@update');
+            $app->get('/', 'ProductCategoryController@getList');
+            $app->delete('/delete/{id}', 'ProductCategoryController@delete');
+        });
 
-// Reservation
-$app->group([
-    'prefix'     => "/reservation",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->post('/', 'ReservationController@create');
-    $app->get('/all', 'ReservationController@getAll');
-    $app->get('/{id}', 'ReservationController@getDetail');
-    $app->post('/{id}', 'ReservationController@update');
-    $app->post('/update-status/{id}', 'ReservationController@updateStatus');
-    $app->get('/', 'ReservationController@getList');
-    $app->delete('/delete/{id}', 'ReservationController@delete');
-});
+        // Product
+        $app->group([
+            'prefix'     => "/product",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'ProductController@create');
+            $app->get('/all', 'ProductController@getAll');
+            $app->get('/{id}', 'ProductController@getDetail');
+            $app->post('/{id}', 'ProductController@update');
+            $app->get('/', 'ProductController@getList');
+            $app->delete('/delete/{id}', 'ProductController@delete');
+        });
 
-// Version
-$app->group([
-    'prefix'     => "/version",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/', 'VersionController@getDetail');
-});
+        // Notification
+        $app->group([
+            'prefix'     => "/notification",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/count-not-read', 'NotificationController@getCount');
+            $app->post('/update-status', 'NotificationController@updateStatus');
+            $app->get('/test', 'NotificationController@testNotificati1on');
+            $app->get('/test-topic', 'NotificationController@testTopic');
+            $app->get('/', 'NotificationController@getList');
+            $app->get('/{id}', 'NotificationController@getDetail');
+            $app->delete('/delete/all', 'NotificationController@deleteAll');
+            $app->delete('/delete/{id}', 'NotificationController@delete');
+        });
 
-// Campaign
-$app->group([
-    'prefix'     => "/campaign",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'CampaignController@getAll');
-});
+        // Commission
+        $app->group([
+            'prefix'     => "/commission",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/detail', 'CommissionController@detail');
+            $app->get('/product/list-order', 'CommissionController@getListProduct');
+            $app->get('/service/list-order', 'CommissionController@getListService');
+            $app->get('/setting', 'CommissionController@getDetailSetting');
+            $app->post('/setting/update', 'CommissionController@updateSetting');
+        });
 
-// Ads
-$app->group([
-    'prefix'     => "/ads",
-    'middleware' => ['jwt.auth']
-], function () use ($app) {
-    $app->get('/all', 'AdsController@getAll');
-});
+        // Reservation
+        $app->group([
+            'prefix'     => "/reservation",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->post('/', 'ReservationController@create');
+            $app->get('/all', 'ReservationController@getAll');
+            $app->get('/{id}', 'ReservationController@getDetail');
+            $app->post('/{id}', 'ReservationController@update');
+            $app->post('/update-status/{id}', 'ReservationController@updateStatus');
+            $app->get('/', 'ReservationController@getList');
+            $app->delete('/delete/{id}', 'ReservationController@delete');
+        });
+
+        // Version
+        $app->group([
+            'prefix'     => "/version",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/', 'VersionController@getDetail');
+        });
+
+        // Campaign
+        $app->group([
+            'prefix'     => "/campaign",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'CampaignController@getAll');
+        });
+
+        // Ads
+        $app->group([
+            'prefix'     => "/ads",
+            'middleware' => ['jwt.auth', 'expired.account']
+        ], function () use ($app) {
+            $app->get('/all', 'AdsController@getAll');
+        });
+    }
+);
+

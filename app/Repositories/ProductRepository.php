@@ -135,4 +135,19 @@ class ProductRepository extends BaseRepository
         return $query;
     }
 
+    public function getByCaterogyIds($product_category_ids, $client_id)
+    {
+        $query = $this->model
+            ->select('*')
+            ->where('is_active', STATUS_ACTIVE)
+            ->where('client_id', $client_id)
+            ->where('is_delete', STATUS_INACTIVE);
+
+        $query = $query->whereIn('category_id', $product_category_ids);
+
+        $result = $query->orderBy('id', 'DESC')->get();
+
+        return $result;
+    }
+
 }

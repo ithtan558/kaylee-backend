@@ -32,6 +32,7 @@ define('ORDER_STATUS_NOT_PAID', 4);
 define('ORDER_STATUS_CANCEL', 5);
 define('ORDER_STATUS_ACCEPTED', 6);
 define('ORDER_STATUS_REFUND', 7);
+define('ORDER_STATUS_REFUND_SALON', 8);
 
 /*
  | define payment method
@@ -112,6 +113,17 @@ define('ERRORS', [
     'cart_supplier_information.address'     => 100027,
     'cart_supplier_information.wards_id'    => 100028,
     'cart_customer.name'                    => 100029,
+    'content'                    => 100030,
+    'expired_account'                    => 100031,
+]);
+
+define('WARNING', [
+    'warning_expired'                    => 100032,
+]);
+
+define('VERSION', [
+    'new_version'                    => 100033,
+    'not_found_version'                    => 100034,
 ]);
 
 /*
@@ -127,7 +139,8 @@ define('PATH_IMAGE', URL . '/upload/images/');
 
 /*
  | define status for reservation
-----------------------------------------------------------------------------
+--
+--------------------------------------------------------------------------
 */
 define('RESERVATION_BOOKED', 1);
 define('RESERVATION_CAME', 2);
@@ -158,3 +171,6 @@ define('PASSWORD', '3j2sv');
 define('FROM', 'KAYLEE');
 define('TYPE', 8);
 define('JSON', 1);
+
+// Client default
+define('CLIENT_DEFAULT', '0765959759');

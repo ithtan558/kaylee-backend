@@ -89,6 +89,8 @@ class OrderService extends BaseService
             if (!empty($customer)) {
                 if (isset($customer['id'])) {
                     $customer_id = $customer['id'];
+                    $customer_query = $this->customerRep->find($customer_id);
+                    $customer['phone'] = $customer_query->phone;
                 } else {
                     // Check exist customer before by phone
                     if (empty($customer['phone'])) {
@@ -910,7 +912,7 @@ class OrderService extends BaseService
         $obj_brand->name = $data->brand_name;
         unset($data->brand_name);
         $obj_brand->id      = $data->brand_id;
-        $obj_brand->address = CommonHelper::fullAddress($data->brand_city_name, $data->brand_district_name, $data->brand_wards_name, $data->brand_location);
+        $obj_brand->location = CommonHelper::fullAddress($data->brand_city_name, $data->brand_district_name, $data->brand_wards_name, $data->brand_location);
         $obj_brand->phone   = $data->brand_phone;
         $obj_brand->logo    = PATH_IMAGE . $data->brand_image;
         unset($data->brand_city_name);
