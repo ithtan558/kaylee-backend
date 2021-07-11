@@ -164,12 +164,13 @@ class OrderRepository extends BaseRepository
 
         $query = $this->model
             ->select(
-                DB::raw('SUM(' . Order::getCol('amount') . ') as amount'),
+                DB::raw('CONVERT(SUM(' . Order::getCol('amount') . '), UNSIGNED INTEGER) as amount'),
                 User::getCol('name'),
                 User::getCol('phone')
             )
             ->from(Order::getTbl())
-            ->join(User::getTbl(), User::getCol("id"), "=", Order::getCol("employee_id"));
+            ->join(OrderEmployee::getTbl(), OrderEmployee::getCol('order_id'), '=', Order::getCol('id'))
+            ->join(User::getTbl(), User::getCol("id"), "=", OrderEmployee::getCol("employee_id"));
 
         if (in_array(ROLE_MANAGER, $roles)) {
             $query = $query->where(Order::getCol('client_id'), $user->client_id);
@@ -184,7 +185,7 @@ class OrderRepository extends BaseRepository
         $query->where(Order::getCol('is_active'), STATUS_ACTIVE);
 
         $result = $query->orderBy(Order::getCol('id'), 'DESC')
-            ->groupBy(Order::getCol('employee_id'))->get();
+            ->groupBy(OrderEmployee::getCol('employee_id'))->get();
 
         return $result;
 

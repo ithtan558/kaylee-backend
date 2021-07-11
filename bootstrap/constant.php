@@ -100,7 +100,7 @@ define('ERRORS', [
     'role_id'                               => 100014,
     'brand_id'                              => 100015,
     'cart_items'                            => 100016,
-    'cart_employee'                         => 100017,
+    'cart_employees'                         => 100017,
     'code'                                  => 100018,
     'brand_ids'                             => 100019,
     'time'                                  => 100020,
@@ -115,6 +115,7 @@ define('ERRORS', [
     'cart_customer.name'                    => 100029,
     'content'                    => 100030,
     'expired_account'                    => 100031,
+    'datetime'                    => 100035,
 ]);
 
 define('WARNING', [
